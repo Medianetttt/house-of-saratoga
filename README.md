@@ -20,3 +20,6 @@ Poi apri http://localhost:4173.
 ## Da sapere
 - Gli incontri nel calendario sono segnaposto: date e luoghi non sono confermati.
 - Le foto in `assets/serate/` sono miniature da 640 px prese dal profilo Instagram: vanno sostituite con gli originali, con il consenso delle persone ritratte.
+
+## Anteprima online
+Questa copia pubblicata su GitHub Pages ha `noindex` in `index.html` e in `robots.txt`, perché è una bozza: va tolto al lancio.
