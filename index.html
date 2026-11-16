@@ -35,6 +35,7 @@
 
     <nav class="nav" id="nav" aria-label="Principale">
       <a href="#house">La House</a>
+      <a href="#gallery">Gallery</a>
       <a href="#valori">I valori</a>
       <a href="#incontri">Incontri</a>
       <a href="#ammissione">Ammissione</a>
@@ -54,6 +55,7 @@
   <span class="mark mark--seal menu__seal" role="img" aria-hidden="true"></span>
   <nav class="menu__nav" aria-label="Menu mobile">
     <a href="#house">La House</a>
+    <a href="#gallery">Gallery</a>
     <a href="#valori">I valori</a>
     <a href="#incontri">Incontri</a>
     <a href="#ammissione">Ammissione</a>
@@ -138,35 +140,55 @@
   </div>
 </section>
 
-<!-- ───────── Dalle serate ───────── -->
-<section class="section section--sage" id="serate" aria-labelledby="serate-title">
+<!-- ───────── Gallery ───────── -->
+<section class="section section--ink" id="gallery" aria-labelledby="gallery-title">
   <div class="wrap">
-    <div class="section__head section__head--split section__head--dark">
+    <div class="section__head section__head--split">
       <div class="head-copy">
-        <p class="eyebrow eyebrow--dark reveal">Dalle serate</p>
-        <h2 id="serate-title" class="display display--lg reveal" style="--d:.05s">Quello che succede alla House<br><em>resta alla House.</em></h2>
+        <p class="eyebrow reveal">Gallery</p>
+        <h2 id="gallery-title" class="display display--lg reveal" style="--d:.05s">Quello che succede alla House<br><em>resta alla House.</em></h2>
       </div>
-      <p class="lede reveal" style="--d:.1s">Questa è la parte che possiamo mostrare. Niente palco, niente cartellini col nome: persone arrivate da sconosciute, andate via diverse.</p>
+      <p class="lede lede--light reveal" style="--d:.1s">Questa è la parte che possiamo mostrare. Niente palco, niente cartellini col nome: persone arrivate da sconosciute, andate via diverse.</p>
     </div>
 
-    <div class="gallery">
-      <figure class="shot reveal">
-        <div class="shot__img" style="--b:1.5"><img src="assets/serate/prima-notte.jpg" width="360" height="640" alt="Una ospite balla durante la prima notte della House" loading="lazy" decoding="async"></div>
-        <figcaption><b>Capitolo uno</b><span>Polignano a Mare · 6 settembre 2026</span><em>Una terrazza sull’Adriatico, una lunga sera di settembre.</em></figcaption>
-      </figure>
-      <figure class="shot reveal" style="--d:.08s">
-        <div class="shot__img" style="--b:2.6"><img src="assets/serate/people-make-the-place.jpg" width="480" height="640" alt="Ospiti durante una serata della House, nella luce rossa del locale" loading="lazy" decoding="async"></div>
-        <figcaption><b>Le persone</b><span>People make the place</span><em>Il luogo conta, ma sono le persone a farlo.</em></figcaption>
-      </figure>
-      <figure class="shot reveal" style="--d:.16s">
-        <div class="shot__img" style="--b:1.35"><img src="assets/serate/shinigami.jpg" width="512" height="640" alt="Lanterne rosse giapponesi alla serata Shinigami" loading="lazy" decoding="async"></div>
-        <figcaption><b>Shinigami</b><span>Halloween 2026</span><em>Una notte a tema giapponese, riservata ai soci e ai loro amici.</em></figcaption>
-      </figure>
+    <div class="gal-bar">
+      <div class="chips gal-filters" id="gal-filters" role="group" aria-label="Filtra le foto per serata"></div>
+      <div class="gal-nav">
+        <button class="gal-nav__btn" type="button" data-gal="prev" aria-label="Foto precedenti">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+        <button class="gal-nav__btn" type="button" data-gal="next" aria-label="Foto successive">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+      </div>
     </div>
-
-    <p class="gallery__more reveal"><a href="https://www.instagram.com/houseofsaratoga/" target="_blank" rel="noopener">Segui la House su Instagram <span aria-hidden="true">→</span></a></p>
+    <div class="gal" id="gal" tabindex="0" role="region" aria-label="Foto delle serate: scorri di lato"></div>
+    <div class="gal__meta">
+      <span class="gal__track" aria-hidden="true"><i id="gal-thumb"></i></span>
+      <span class="gal__count" id="gal-count"></span>
+    </div>
+    <div class="gal__foot">
+      <a class="gal__ig" href="https://www.instagram.com/houseofsaratoga/" target="_blank" rel="noopener">Segui la House su Instagram <span aria-hidden="true">→</span></a>
+    </div>
   </div>
 </section>
+
+<!-- Ingrandimento foto -->
+<dialog class="lightbox" id="lightbox" aria-label="Foto ingrandita">
+  <button class="lightbox__btn lightbox__close" type="button" data-lb="close" aria-label="Chiudi">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"/></svg>
+  </button>
+  <button class="lightbox__btn lightbox__prev" type="button" data-lb="prev" aria-label="Foto precedente">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+  </button>
+  <button class="lightbox__btn lightbox__next" type="button" data-lb="next" aria-label="Foto successiva">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+  </button>
+  <figure class="lightbox__fig">
+    <img id="lb-img" alt="">
+    <figcaption id="lb-cap"></figcaption>
+  </figure>
+</dialog>
 
 <!-- ───────── I valori ───────── -->
 <section class="section section--ivory" id="valori" aria-labelledby="valori-title">
@@ -409,6 +431,7 @@
       <nav class="footer__col" aria-label="La House">
         <p class="footer__k">La House</p>
         <a href="#house">Chi siamo</a>
+        <a href="#gallery">Gallery</a>
         <a href="#valori">I valori</a>
           <a href="#ammissione">Ammissione</a>
         <a href="#domande">Domande frequenti</a>
@@ -429,6 +452,9 @@
 
     <div class="footer__legal">
       <p>© 2026 House of Saratoga. Tutti i diritti riservati.</p>
+      <a class="powered" href="https://mdnt.it" target="_blank" rel="noopener" aria-label="Powered by Medianet">
+        <span>Powered by</span><span class="mark mark--medianet" aria-hidden="true"></span>
+      </a>
       <a class="footer__top" href="#top">Torna su
         <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M6 13V1M1 6l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1"/></svg>
       </a>
@@ -529,6 +555,7 @@
 </dialog>
 
 <script src="js/events.js"></script>
+<script src="js/gallery.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

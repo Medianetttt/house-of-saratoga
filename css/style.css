@@ -68,6 +68,7 @@ h1, h2, h3, h4, p, blockquote, figure, dl, dd { margin: 0; }
 .mark--monogram { --m: url("../assets/monogram.png"); aspect-ratio: 358 / 417; }
 .mark--wordline { --m: url("../assets/wordmark-line.png"); aspect-ratio: 2388 / 192; }
 .mark--stacked  { --m: url("../assets/wordmark-stacked.png"); aspect-ratio: 2388 / 890; }
+.mark--medianet { --m: url("../assets/medianet.png"); aspect-ratio: 1666 / 181; }
 
 /* Filigrana: marchio grande, quasi invisibile, ritagliato dal bordo della sezione */
 .has-mark { overflow: clip; }
@@ -288,25 +289,54 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 .quote p { font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3.2rem); line-height: 1.1; font-weight: 300; font-style: italic; letter-spacing: -.01em; text-wrap: balance; }
 .quote footer { font-family: var(--sans); font-weight: 300; font-size: .74rem; letter-spacing: .12em; margin-top: var(--sp-3); opacity: .7; }
 
-/* ---------- Dalle serate ---------- */
-/* Foto in duotone verde/salvia: uniformano le immagini al marchio e reggono la bassa risoluzione. Al passaggio tornano a colori. */
-.gallery { display: flex; gap: var(--sp-3); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-.gallery::-webkit-scrollbar { display: none; }
-@media (min-width: 800px) { .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); overflow: visible; margin: 0; padding: 0; } }
-.shot { flex: none; width: 72vw; max-width: 320px; scroll-snap-align: start; display: grid; gap: 14px; align-content: start; }
-@media (min-width: 800px) { .shot { width: auto; max-width: none; } .shot:nth-child(2) { margin-top: var(--sp-5); } }
-.shot__img { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--forest); isolation: isolate; }
-.shot__img img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.1) brightness(var(--b, 1.2)); mix-blend-mode: screen; transition: filter .7s var(--ease), transform 1.2s var(--ease), mix-blend-mode .7s; }
-.shot__img::after { content: ""; position: absolute; inset: 0; background: var(--sage); mix-blend-mode: multiply; transition: opacity .7s var(--ease); pointer-events: none; }
-.shot:hover .shot__img img { filter: none; mix-blend-mode: normal; transform: scale(1.04); }
-.shot:hover .shot__img::after { opacity: 0; }
-.shot figcaption { display: grid; gap: 2px; }
-.shot figcaption b { font-weight: 400; font-size: clamp(1.4rem, 1.2rem + .6vw, 1.75rem); line-height: 1.1; color: var(--forest); }
-.shot figcaption span { font-family: var(--sans); font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: var(--moss); }
-.shot figcaption em { font-size: 1.02rem; line-height: 1.35; color: var(--forest); opacity: .85; margin-top: 4px; }
-.gallery__more { margin-top: var(--sp-4); font-family: var(--sans); font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; }
-.gallery__more a { color: var(--forest); text-decoration: none; padding-block: 6px; border-bottom: 1px solid var(--forest); }
-.gallery__more a:hover { border-bottom-color: transparent; }
+/* ---------- Gallery ---------- */
+/* Striscia orizzontale: tutte le foto nello stesso formato 4:5, scorrevole, allineata al testo e aperta sul bordo destro. */
+#gallery { overflow-x: clip; }
+.gal-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-3); min-width: 0; }
+.gal-bar .chips { flex: 1; min-width: 0; }
+@media (min-width: 900px) { .chips.gal-filters { justify-content: flex-start; } }
+.gal-nav { display: none; gap: 10px; flex: none; }
+@media (min-width: 900px) { .gal-nav { display: flex; } }
+.gal-nav__btn { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 1px solid var(--line-dark); border-radius: 50%; color: var(--sage); cursor: pointer; transition: border-color .3s, background-color .3s, opacity .3s; }
+.gal-nav__btn:hover:not(:disabled) { border-color: var(--sage); background: rgba(204, 219, 190, .08); }
+.gal-nav__btn:disabled { opacity: .3; cursor: default; }
+
+.gal { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); outline-offset: -2px; }
+.gal::-webkit-scrollbar { display: none; }
+@media (min-width: 900px) { .gal { gap: 14px; margin-inline: 0 calc(50% - 50vw); padding-inline: 0 var(--gutter); scroll-padding-inline: 0; } }
+.gal__item { flex: none; position: relative; width: min(64vw, 280px); aspect-ratio: 4 / 5; padding: 0; border: 0; background: #232323; overflow: hidden; cursor: zoom-in; scroll-snap-align: start; }
+@media (min-width: 900px) { .gal__item { width: clamp(240px, 23vw, 300px); } }
+.gal__item img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; transition: transform 1.2s var(--ease), filter .6s; filter: saturate(.92) brightness(.96); }
+.gal__item::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(10, 14, 8, .72), rgba(10, 14, 8, 0) 42%); pointer-events: none; transition: opacity .5s; }
+.gal__tag { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--sans); font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; color: #eef3e6; opacity: .85; text-align: left; pointer-events: none; }
+.gal__item:hover img, .gal__item:focus-visible img { transform: scale(1.05); filter: none; }
+.gal__item::after { content: ""; position: absolute; inset: 0; z-index: 3; box-shadow: inset 0 0 0 1px rgba(204, 219, 190, 0); transition: box-shadow .4s; pointer-events: none; }
+.gal__item:hover::after, .gal__item:focus-visible::after { box-shadow: inset 0 0 0 1px rgba(204, 219, 190, .55); }
+
+.gal__meta { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
+.gal__track { position: relative; flex: 1; height: 1px; background: var(--line-dark); }
+.gal__track i { position: absolute; top: -1px; left: 0; height: 3px; width: 30%; background: var(--sage); transition: left .15s linear, width .3s; }
+.gal__count { flex: none; font-family: var(--sans); font-size: .62rem; letter-spacing: .22em; text-transform: uppercase; color: var(--sage-dim); }
+.gal__foot { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); margin-top: var(--sp-2); }
+.gal__ig { font-family: var(--sans); font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--sage); text-decoration: none; padding-block: 8px; border-bottom: 1px solid currentColor; }
+.gal__ig:hover { border-bottom-color: transparent; }
+
+/* Ingrandimento foto */
+.lightbox { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgba(9, 13, 7, .95); color: var(--sage); overflow: hidden; }
+.lightbox::backdrop { background: rgba(9, 13, 7, .95); }
+.lightbox[open] { display: grid; place-items: center; animation: fade-in .35s var(--ease); }
+.lightbox__fig { margin: 0; display: grid; justify-items: center; gap: 12px; max-width: min(94vw, 1100px); touch-action: pan-y; }
+.lightbox__fig img { max-width: 100%; max-height: calc(100vh - 110px); max-height: calc(100dvh - 110px); width: auto; height: auto; object-fit: contain; display: block; background: #1b1b1b; transition: opacity .25s; }
+.lightbox__fig img.is-loading { opacity: .35; }
+.lightbox__fig figcaption { font-family: var(--sans); font-size: .66rem; letter-spacing: .22em; text-transform: uppercase; color: var(--sage-dim); text-align: center; }
+.lightbox__fig figcaption b { font-weight: 400; color: var(--sage); margin-right: .9em; }
+.lightbox__btn { position: absolute; width: 48px; height: 48px; display: grid; place-items: center; background: none; border: 1px solid transparent; border-radius: 50%; color: var(--sage); cursor: pointer; transition: border-color .3s, background-color .3s; z-index: 2; }
+.lightbox__btn:hover { border-color: var(--line-dark); background: rgba(204, 219, 190, .08); }
+.lightbox__close { top: 14px; right: 14px; }
+.lightbox__prev, .lightbox__next { top: 50%; transform: translateY(-50%); }
+.lightbox__prev { left: 14px; }
+.lightbox__next { right: 14px; }
+@media (max-width: 700px) { .lightbox__prev, .lightbox__next { top: auto; bottom: 14px; transform: none; } .lightbox__prev { left: calc(50% - 64px); } .lightbox__next { right: calc(50% - 64px); } .lightbox__fig img { max-height: calc(100dvh - 190px); } }
 
 /* ---------- Livelli ---------- */
 .levels { display: grid; }
@@ -362,6 +392,14 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 .ev__date { display: flex; align-items: baseline; gap: 12px; color: var(--sage); }
 .ev__day { font-size: clamp(2.4rem, 2rem + 1.8vw, 3.6rem); line-height: .9; font-weight: 300; letter-spacing: -.02em; }
 .ev__mon { font-family: var(--sans); font-size: .66rem; letter-spacing: .24em; text-transform: uppercase; color: var(--sage-dim); line-height: 1.5; }
+.ev__soon { display: grid; gap: 8px; justify-items: start; }
+.ev__blur { display: flex; align-items: baseline; gap: 12px; filter: blur(7px); user-select: none; pointer-events: none; animation: soon-breathe 5s ease-in-out infinite alternate; }
+.ev__blur .ev__day { font-size: clamp(3rem, 2.4rem + 2.6vw, 4.8rem); color: #e4ecda; font-weight: 400; }
+.ev__blur .ev__mon { color: #e4ecda; font-size: .8rem; }
+.ev__soon small { font-family: var(--sans); font-size: .6rem; letter-spacing: .24em; text-transform: uppercase; color: var(--sage); }
+@keyframes soon-breathe { from { filter: blur(5px); } to { filter: blur(9px); } }
+@media (min-width: 900px) { .ev__blur { flex-direction: column; gap: 6px; } }
+.chips[hidden] { display: none; }
 .ev__tba { display: grid; gap: 4px; }
 .ev__tba i { font-size: clamp(1.4rem, 1.2rem + .8vw, 1.8rem); line-height: 1.1; font-weight: 300; }
 .ev__tba small { font-family: var(--sans); font-size: .6rem; letter-spacing: .24em; text-transform: uppercase; color: var(--sage-dim); }
@@ -459,6 +497,12 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 .footer__col a:hover, .footer__col .link:hover { opacity: 1; background-size: 100% 1px; }
 .footer__legal { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--sp-2) var(--sp-3); padding-block: var(--sp-2) calc(var(--sp-2) + env(safe-area-inset-bottom)); border-top: 1px solid var(--line-dark); font-family: var(--sans); font-size: .66rem; letter-spacing: .1em; }
 .footer__legal p { opacity: .6; }
+/* Credito Medianet: marchio in salvia come il resto del footer (per il rosso originale: background-color: #e30a17) */
+.powered { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; opacity: .65; padding-block: 8px; transition: opacity .3s; }
+.powered span:first-child { font-size: .6rem; letter-spacing: .22em; text-transform: uppercase; }
+.powered .mark { height: 10px; width: auto; }
+.powered:hover { opacity: 1; }
+@media (min-width: 700px) { .footer__legal { display: grid; grid-template-columns: 1fr auto 1fr; } .footer__legal .footer__top { justify-self: end; } }
 .footer__top { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; letter-spacing: .22em; text-transform: uppercase; opacity: .8; padding-block: 8px; }
 .footer__top svg { transition: transform .4s var(--ease); }
 .footer__top:hover svg { transform: translateY(-3px); }
@@ -536,4 +580,7 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   .js .reveal { opacity: 1; transform: none; }
   .radar__sweep, .radar__ping { display: none; }
+  .ev__blur { animation: none; }
+  .gal__item { animation: none; }
+  .gal__item img { transition: none; }
 }

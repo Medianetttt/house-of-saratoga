@@ -56,6 +56,113 @@
     });
   })();
 
+  /* ---------- Gallery: filtri, "mostra tutte", ingrandimento ---------- */
+  (function () {
+    var data = window.HOS_GALLERY;
+    var grid = $("#gal");
+    if (!data || !grid) return;
+    var SETS = data.sets, PHOTOS = data.photos;
+    var filtersEl = $("#gal-filters");
+    var thumb = $("#gal-thumb"), countEl2 = $("#gal-count");
+    var btnPrev = $('[data-gal="prev"]'), btnNext = $('[data-gal="next"]');
+    var lb = $("#lightbox"), lbImg = $("#lb-img"), lbCap = $("#lb-cap");
+    var active = "all", current = 0, list = PHOTOS;
+
+    function label(p) { return SETS[p.set] || ""; }
+    function filtered() { return active === "all" ? PHOTOS : PHOTOS.filter(function (p) { return p.set === active; }); }
+
+    function renderFilters() {
+      var keys = Object.keys(SETS).filter(function (k) { return PHOTOS.some(function (p) { return p.set === k; }); });
+      var chips = [["all", "Tutte", PHOTOS.length]].concat(keys.map(function (k) {
+        return [k, SETS[k], PHOTOS.filter(function (p) { return p.set === k; }).length];
+      }));
+      filtersEl.innerHTML = chips.map(function (c) {
+        return '<button type="button" class="chip" data-gfilter="' + esc(c[0]) + '" aria-pressed="' + (c[0] === active) + '">' + esc(c[1]) + " <small>" + c[2] + "</small></button>";
+      }).join("");
+    }
+
+    function renderGrid() {
+      list = filtered();
+      grid.innerHTML = list.map(function (p, i) {
+        return '<button type="button" class="gal__item" data-i="' + i + '" aria-label="Ingrandisci foto ' + (i + 1) + " di " + list.length + " · " + esc(label(p)) + '">' +
+          '<img src="assets/gallery/grid/' + p.id + '.jpg" width="' + p.w + '" height="' + p.h + '" alt="Foto della serata ' + esc(label(p)) + '" loading="lazy" decoding="async">' +
+          '<span class="gal__tag">' + esc(label(p)) + "</span></button>";
+      }).join("");
+      grid.scrollLeft = 0;
+      countEl2.textContent = list.length + (list.length === 1 ? " foto" : " foto");
+      updateStrip();
+    }
+
+    /* Barra di avanzamento e frecce della striscia */
+    function updateStrip() {
+      var sw = grid.scrollWidth, cw = grid.clientWidth, max = sw - cw;
+      var w = sw ? Math.min(100, (cw / sw) * 100) : 100;
+      thumb.style.width = w.toFixed(1) + "%";
+      thumb.style.left = (max > 0 ? (grid.scrollLeft / max) * (100 - w) : 0).toFixed(1) + "%";
+      btnPrev.disabled = grid.scrollLeft <= 4;
+      btnNext.disabled = max <= 4 || grid.scrollLeft >= max - 4;
+    }
+    grid.addEventListener("scroll", function () { requestAnimationFrame(updateStrip); }, { passive: true });
+    window.addEventListener("resize", updateStrip);
+    function step(dir) {
+      var it = $(".gal__item", grid);
+      var d = it ? it.getBoundingClientRect().width + 14 : 300;
+      grid.scrollBy({ left: dir * d * 2, behavior: reduceMotion ? "auto" : "smooth" });
+    }
+    btnPrev.addEventListener("click", function () { step(-1); });
+    btnNext.addEventListener("click", function () { step(1); });
+
+    filtersEl.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-gfilter]");
+      if (!b) return;
+      active = b.getAttribute("data-gfilter");
+      $$(".chip", filtersEl).forEach(function (c) { c.setAttribute("aria-pressed", String(c === b)); });
+      renderGrid();
+    });
+    grid.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-i]");
+      if (b) openAt(+b.getAttribute("data-i"));
+    });
+
+    /* Ingrandimento */
+    function show(i) {
+      current = (i + list.length) % list.length;
+      var p = list[current];
+      lbImg.classList.add("is-loading");
+      lbImg.onload = function () { lbImg.classList.remove("is-loading"); };
+      lbImg.src = "assets/gallery/full/" + p.id + ".jpg";
+      lbImg.alt = "Foto della serata " + label(p);
+      lbCap.innerHTML = "<b>" + esc(label(p)) + "</b>" + (current + 1) + " / " + list.length;
+      [1, -1].forEach(function (d) { var n = list[(current + d + list.length) % list.length]; new Image().src = "assets/gallery/full/" + n.id + ".jpg"; });
+    }
+    function openAt(i) {
+      show(i);
+      if (!lb.open) lb.showModal();
+      document.body.classList.add("is-locked");
+    }
+    function closeLb() { if (lb.open) lb.close(); document.body.classList.remove("is-locked"); }
+    lb.addEventListener("close", function () { document.body.classList.remove("is-locked"); });
+    lb.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-lb]");
+      if (b) { var a = b.getAttribute("data-lb"); if (a === "close") closeLb(); else show(current + (a === "next" ? 1 : -1)); return; }
+      if (e.target === lb || e.target.classList.contains("lightbox__fig")) closeLb(); // clic sullo sfondo
+    });
+    lb.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { e.preventDefault(); show(current + 1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); show(current - 1); }
+    });
+    var x0 = null;
+    lb.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener("touchend", function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 50) show(current + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+
+    renderFilters();
+    renderGrid();
+  })();
+
   /* ---------- Header: sfondo dopo lo scroll ---------- */
   var header = $(".site-header");
   function onScroll() { header.classList.toggle("is-solid", window.scrollY > 24); }
@@ -133,6 +240,12 @@
   }
   function dateBlock(ev) {
     var a = parseDay(ev.start), b = parseDay(ev.end);
+    // Data in arrivo: cifre finte sfocate (non rappresentano nessuna data) e scritta nitida sotto.
+    if (!a && ev.blurDate) {
+      return '<span class="sr-only">' + esc(ev.when) + "</span>" +
+        '<div class="ev__soon" aria-hidden="true"><span class="ev__blur"><span class="ev__day">88</span><span class="ev__mon">XXX</span></span>' +
+        "<small>" + esc(ev.when) + "</small></div>";
+    }
     if (!a) return '<div class="ev__tba"><i>' + esc(ev.when) + "</i><small>Calendario</small></div>";
     var day = String(a.getDate());
     var mon = MONTHS[a.getMonth()];
@@ -171,7 +284,8 @@
 
   function renderEvents() {
     var items = SORTED.filter(function (e) { return activeFilter === "all" || e.type === activeFilter; });
-    countEl.textContent = items.length === 1 ? "1 incontro" : items.length + " incontri";
+    var allSoon = items.length && items.every(function (e) { return e.blurDate; });
+    countEl.textContent = allSoon ? "Data in arrivo" : (items.length === 1 ? "1 incontro" : items.length + " incontri");
 
     if (!items.length) {
       listEl.innerHTML = '<div class="agenda__empty"><p>' +

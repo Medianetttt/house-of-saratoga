@@ -5,9 +5,8 @@
  * Quando ci sarà il backend, `HOS_EVENTS` potrà essere sostituito da una fetch
  * verso l'API e `endpoint` puntare all'endpoint che riceve le richieste.
  *
- * ATTENZIONE — contenuti segnaposto: date e luoghi NON sono confermati.
- * I tre incontri qui sotto riflettono i formati descritti nella Company Strategy
- * v1 (cene fondative, weekend signature, marquee event), non un calendario reale.
+ * ATTENZIONE — contenuto segnaposto: la data del prossimo incontro NON è confermata
+ * ed è mostrata sfocata finché non viene annunciata.
  */
 
 window.HOS_CONFIG = {
@@ -24,6 +23,7 @@ window.HOS_CONFIG = {
  *  start   data di inizio "AAAA-MM-GG", oppure null se non è ancora definita
  *  end     data di fine "AAAA-MM-GG" (facoltativa: weekend e viaggi)
  *  when    testo mostrato quando la data non c'è ("Data in definizione")
+ *  blurDate  true = mostra una data sfocata con la scritta "when" (incontro in arrivo)
  *  where   testo libero
  *  seats   numero di posti, oppure null se non comunicato
  *  blurb   2 righe di descrizione
@@ -32,42 +32,17 @@ window.HOS_CONFIG = {
  */
 window.HOS_EVENTS = [
   {
-    id: "cena-fondativa",
-    type: "Cena fondativa",
-    title: "Cena fondativa",
+    id: "prossimo-incontro",
+    type: "Prossimo incontro",
+    title: "Il prossimo incontro",
     start: null,
     end: null,
-    when: "Data in definizione",
-    where: "Luogo comunicato agli ospiti",
-    seats: null,
-    blurb:
-      "Una tavola, pochi ospiti scelti uno a uno. Il primo modo per conoscere la House e le persone che la stanno costruendo.",
-    status: "request",
-  },
-  {
-    id: "signature-weekend",
-    type: "Signature Weekend",
-    title: "Il primo Signature Weekend",
-    start: null,
-    end: null,
-    when: "Data in definizione",
-    where: "Luogo da annunciare",
-    seats: 15,
-    blurb:
-      "Un weekend intero, quindici persone, un gruppo composto per equilibrio. Ospitalità senza attriti e tempo lasciato libero.",
-    status: "request",
-  },
-  {
-    id: "marquee-event",
-    type: "Marquee Event",
-    title: "Marquee Event",
-    start: null,
-    end: null,
-    when: "Da annunciare",
+    blurDate: true, // data sfocata: "Annunciata a breve". Per annunciarla: metti start/end e togli blurDate.
+    when: "Annunciata a breve",
     where: "Da annunciare",
     seats: null,
     blurb:
-      "Un viaggio costruito attorno a un grande evento — Formula 1, tennis, regate, moda. Non è ancora aperto: segnala il tuo interesse.",
+      "La data sarà annunciata a breve. Segnala il tuo interesse: ti scriveremo per primi, appena l’incontro sarà aperto.",
     status: "interest",
   },
 ];

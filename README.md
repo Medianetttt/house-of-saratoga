@@ -19,7 +19,7 @@ Poi apri http://localhost:4173.
 
 ## Da sapere
 - Gli incontri nel calendario sono segnaposto: date e luoghi non sono confermati.
-- Le foto in `assets/serate/` sono miniature da 640 px prese dal profilo Instagram: vanno sostituite con gli originali, con il consenso delle persone ritratte.
+- Le foto della gallery (`assets/gallery/`, elenco in `js/gallery.js`) vengono da una cartella Drive condivisa e da foto inviate dal cliente: sono anteprime ridimensionate (760 e 1200 px). Il consenso delle persone ritratte non è verificato. `assets/serate/polignano.jpg` è una miniatura da Instagram usata come sfondo sfocato.
 
 ## Anteprima online
 Questa copia pubblicata su GitHub Pages ha `noindex` in `index.html` e in `robots.txt`, perché è una bozza: va tolto al lancio.
