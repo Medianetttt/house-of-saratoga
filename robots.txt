@@ -1,2 +1,4 @@
 User-agent: *
 Disallow: /
+
+Sitemap: https://houseofsaratoga.it/sitemap.xml
