@@ -411,7 +411,11 @@
     if (p) p.textContent = msg;
     if (field) field.classList.toggle("has-error", !!msg);
     var input = form.elements[name];
-    if (input) input.setAttribute("aria-invalid", msg ? "true" : "false");
+    if (p && !p.id) p.id = "err-" + name;
+    if (input) {
+      input.setAttribute("aria-invalid", msg ? "true" : "false");
+      if (p) { if (msg) input.setAttribute("aria-describedby", p.id); else input.removeAttribute("aria-describedby"); }
+    }
   }
   function clearErrors() {
     Object.keys(rules).forEach(function (n) { setError(n, ""); });
