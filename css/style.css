@@ -255,6 +255,8 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 .grid__body { display: grid; gap: var(--sp-3); min-width: 0; }
 .section--ivory .display { color: var(--forest); }
 
+.prose--stack { display: grid; gap: var(--sp-2); }
+.prose--stack p:first-child { font-size: clamp(1.25rem, 1.1rem + .6vw, 1.55rem); line-height: 1.35; }
 .prose--2col { display: grid; gap: var(--sp-2); }
 @media (min-width: 900px) { .prose--2col { grid-template-columns: 1fr 1fr; gap: var(--sp-3) var(--sp-5); } .prose--2col p:nth-child(3) { grid-column: 1 / -1; } }
 
@@ -300,6 +302,16 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 /* ---------- Gallery ---------- */
 /* Striscia orizzontale: tutte le foto nello stesso formato 4:5, scorrevole, allineata al testo e aperta sul bordo destro. */
 #gallery { overflow-x: clip; }
+.chapters { display: grid; gap: 0; margin-bottom: var(--sp-4); border-top: 1px solid var(--line-dark); }
+.chapters li { display: grid; gap: 4px; align-content: start; padding: var(--sp-2) 0; border-bottom: 1px solid var(--line-dark); }
+.chapters__k { font-family: var(--sans); font-weight: 400; font-size: .68rem; letter-spacing: .24em; text-transform: uppercase; color: var(--sage-dim); }
+.chapters b { font-weight: 300; font-style: italic; font-size: clamp(1.3rem, 1.1rem + .8vw, 1.8rem); line-height: 1.1; }
+.chapters li > span:last-child:not(.chapters__k) { opacity: .75; font-size: 1.05rem; }
+@media (min-width: 800px) {
+  .chapters { grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line-dark); }
+  .chapters li { padding: var(--sp-3) var(--sp-3) var(--sp-3) 0; border-bottom: 0; }
+  .chapters li + li { border-left: 1px solid var(--line-dark); padding-left: var(--sp-3); }
+}
 .gal-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-3); min-width: 0; }
 .gal-bar .chips { flex: 1; min-width: 0; }
 @media (min-width: 900px) { .chips.gal-filters { justify-content: flex-start; } }
@@ -367,10 +379,10 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 .callout__t { font-size: clamp(1.2rem, 1.05rem + .7vw, 1.6rem); line-height: 1.3; font-style: italic; font-weight: 300; max-width: 34em; }
 
 /* ---------- Incontri ---------- */
-.facts { display: none; border-block: 1px solid var(--line-dark); margin-bottom: var(--sp-5); } /* su mobile ripete il testo sopra */
+.facts { display: grid; border-block: 1px solid var(--line-dark); margin-bottom: var(--sp-5); }
 .facts li { display: grid; gap: 4px; padding: var(--sp-2) 0; }
 .facts li + li { border-top: 1px solid var(--line-dark); }
-.facts b { font-weight: 400; font-size: clamp(1.5rem, 1.2rem + 1vw, 2.1rem); line-height: 1; }
+.facts b { font-weight: 400; font-size: clamp(1.4rem, 1.15rem + .9vw, 1.9rem); line-height: 1.1; text-wrap: balance; }
 .facts span { font-family: var(--sans); font-weight: 300; font-size: .66rem; letter-spacing: .18em; text-transform: uppercase; opacity: .7; }
 @media (min-width: 800px) { .facts { display: grid; grid-template-columns: repeat(3, 1fr); } .facts li { padding: var(--sp-3) var(--sp-3) var(--sp-3) 0; } .facts li + li { border-top: 0; border-left: 1px solid var(--line-dark); padding-left: var(--sp-3); } }
 

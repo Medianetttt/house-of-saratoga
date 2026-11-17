@@ -353,7 +353,7 @@
       ? (isInterest
           ? "Questo incontro non è ancora aperto. Lascia i tuoi dati: ti scriveremo quando sarà il momento."
           : "Il posto non è garantito: ogni richiesta viene valutata personalmente, anche per comporre un gruppo equilibrato.")
-      : "Ogni richiesta viene letta personalmente. Più sai raccontarci con semplicità chi sei, meglio è.";
+      : "Non cerchiamo un curriculum perfetto. Ci interessa sapere chi sei.";
     if (ev) {
       chip.hidden = false;
       chip.textContent = [ev.when, ev.where].join(" · ");
