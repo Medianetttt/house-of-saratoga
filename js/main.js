@@ -433,11 +433,20 @@
   });
 
   /* Validazione */
+  // Instagram obbligatorio: accetta @nomeprofilo, nomeprofilo o il link al profilo. Restituisce l'handle senza @, o "".
+  function igHandle(v) {
+    v = (v || "").trim();
+    var u = v.match(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\/([A-Za-z0-9._]{1,30})\/?(?:[?#].*)?$/i);
+    if (u) { var reserved = /^(p|reel|reels|explore|stories|accounts|tv)$/i; return reserved.test(u[1]) ? "" : u[1]; }
+    var h = v.replace(/^@/, "");
+    return /^[A-Za-z0-9._]{1,30}$/.test(h) ? h : "";
+  }
   var rules = {
     firstName: function (v) { return v.trim() ? "" : "Inserisci il tuo nome."; },
     lastName: function (v) { return v.trim() ? "" : "Inserisci il tuo cognome."; },
     email: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? "" : "Inserisci un indirizzo email valido."; },
     role: function (v) { return v.trim() ? "" : "Raccontaci di cosa ti occupi."; },
+    instagram: function (v) { return igHandle(v) ? "" : "Inserisci il tuo profilo Instagram: @nomeprofilo oppure il link."; },
     note: function (v) { return v.trim().length >= 20 ? "" : "Scrivi almeno due righe: ci aiuta a conoscerti."; },
     consent: function (v, el) { return el.checked ? "" : "Per procedere serve il tuo consenso."; },
   };
@@ -489,7 +498,7 @@
       email: fd.get("email").trim(),
       phone: (fd.get("phone") || "").trim(),
       role: fd.get("role").trim(),
-      link: (fd.get("link") || "").trim(),
+      instagram: "@" + igHandle(fd.get("instagram")),
       referral: (fd.get("referral") || "").trim(),
       note: fd.get("note").trim(),
       consent: true,

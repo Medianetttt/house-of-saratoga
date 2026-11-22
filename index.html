@@ -33,10 +33,11 @@
 </head>
 
 <body>
+<div id="top"></div> <!-- àncora «inizio pagina»: l'intestazione è fissa, quindi non può fare da bersaglio -->
 <a class="skip" href="#house">Vai al contenuto</a>
 
 <!-- ───────── Header ───────── -->
-<header class="site-header" id="top">
+<header class="site-header">
   <div class="site-header__bar wrap">
     <a class="brand" href="#top" aria-label="House of Saratoga — inizio pagina">
       <span class="mark mark--monogram" aria-hidden="true"></span>
@@ -524,8 +525,9 @@
           <p class="err" data-err="role"></p>
         </div>
         <div class="field">
-          <label for="f-link">Un link utile <span class="opt">facoltativo</span></label>
-          <input id="f-link" name="link" type="url" inputmode="url" placeholder="LinkedIn, sito, portfolio">
+          <label for="f-ig">Instagram</label>
+          <input id="f-ig" name="instagram" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="@nomeprofilo o link al profilo" required>
+          <p class="err" data-err="instagram"></p>
         </div>
         <div class="field">
           <label for="f-ref">Chi ti ha invitato <span class="opt">facoltativo</span></label>
