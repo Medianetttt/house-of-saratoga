@@ -262,6 +262,32 @@
     window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   })();
 
+  /* ---------- Testi: niente parole sole all'ultima riga ---------- */
+  // Lega con spazi non separabili le ultime tre parole di ogni testo (la riga finale ne ha sempre almeno tre).
+  // Si ferma a un <br>; ogni elemento si tratta una volta sola, quindi si può richiamare dopo ogni render.
+  var TIDY_SEL = "main p, main h1, main h2, main h3, main h4, main summary, main li, main dd, main blockquote footer, .footer p, .modal p";
+  function tidyText(root) {
+    $$(TIDY_SEL, root || doc).forEach(function (el) {
+      if (el.dataset.nb || el.classList.contains("eyebrow") || el.closest(".chips, .btn, .err")) return;
+      if (el.querySelector("p, li, div, h1, h2, h3, h4, ul, ol, dl, article, details")) return;   // il testo lo tratta l'elemento interno
+      el.dataset.nb = "1";
+      var it = doc.createNodeIterator(el, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT), nodes = [], n;
+      while ((n = it.nextNode())) {
+        if (n.nodeType === 1) { if (n.tagName === "BR") nodes = []; continue; }
+        if (n.nodeValue.trim()) nodes.push(n);
+      }
+      var left = 2, NB = " ";
+      for (var i = nodes.length - 1; i >= 0 && left > 0; i--) {
+        var chars = nodes[i].nodeValue.split(""), end = chars.length;
+        if (i < nodes.length - 1 && chars[end - 1] === " ") { chars[end - 1] = NB; left--; }   // spazio tra due nodi
+        while (end > 0 && /\s/.test(chars[end - 1])) end--;
+        for (var k = end - 1; k > 0 && left > 0; k--) { if (chars[k] === " ") { chars[k] = NB; left--; } }
+        if (left > 0 && chars[0] === " " && i > 0) { chars[0] = NB; left--; }
+        nodes[i].nodeValue = chars.join("");
+      }
+    });
+  }
+
   /* ---------- Incontri ---------- */
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
@@ -289,14 +315,70 @@
     return '<span class="ev__day">' + day + '</span><span class="ev__mon">' + mon + "<br>" + a.getFullYear() + "</span>";
   }
 
+  // Un incontro passato (ultimo giorno prima di oggi) non compare più: né nel calendario né in evidenza.
+  var TODAY = (function () { var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); })();
+  function isPast(ev) { var d = parseDay(ev.end) || parseDay(ev.start); return !!d && d < TODAY; }
+
   // Ordine: prima le date certe (dalla più vicina), poi quelle da definire.
-  var SORTED = EVENTS.map(function (e, i) { return { e: e, i: i }; }).sort(function (x, y) {
+  var SORTED = EVENTS.filter(function (e) { return !isPast(e); }).map(function (e, i) { return { e: e, i: i }; }).sort(function (x, y) {
     var dx = parseDay(x.e.start), dy = parseDay(y.e.start);
     if (dx && dy) return dx - dy;
     if (dx) return -1;
     if (dy) return 1;
     return x.i - y.i;
   }).map(function (o) { return o.e; });
+
+  /* ---------- Evento in evidenza (sotto l'hero) ---------- */
+  var MONTHS_FULL = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+  var WEEKDAYS = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
+  function countdown(a) {
+    var n = Math.round((a - TODAY) / 86400000);
+    if (n === 0) return "oggi";
+    if (n === 1) return "domani";
+    return n > 1 && n <= 45 ? "tra " + n + " giorni" : "";
+  }
+  function renderFeatured() {
+    var sec = $("#evento"), box = $("#event-hl"), chip = $(".hero__next");
+    var ev = SORTED[0];
+    if (!sec || !box || !ev) return;
+    var a = parseDay(ev.start), b = parseDay(ev.end);
+    var open = ev.status !== "interest";
+    var cd = a ? countdown(a) : "";
+    var day = a ? String(a.getDate()) : "", mon = "", dow = "";
+    if (a) {
+      mon = MONTHS_FULL[a.getMonth()] + " " + a.getFullYear();
+      dow = WEEKDAYS[a.getDay()];
+      if (b && b > a) { day = a.getDate() + "–" + b.getDate(); mon = MONTHS_FULL[b.getMonth()] + " " + b.getFullYear(); dow = ""; }
+    }
+    var meta = [["Dove", ev.where]];
+    if (ev.time) meta.push(["Ore", ev.time]);
+    if (ev.price) meta.push(["Quota", ev.price]);
+    if (ev.seats) meta.push(["Posti", ev.seats + " posti"]);
+    box.innerHTML =
+      '<div class="event-hl__main">' +
+        '<p class="eyebrow eyebrow--dark"><span class="event-hl__dot" aria-hidden="true"></span>Prossimo evento' + (cd ? ' <span class="event-hl__cd">' + esc(cd) + "</span>" : "") + "</p>" +
+        '<h2 class="display display--xl event-hl__title" id="evento-title">' + esc(ev.title) + "</h2>" +
+        '<p class="event-hl__type">' + esc(ev.type) + "</p>" +
+        '<div class="event-hl__date">' + (a
+          ? '<span class="event-hl__day">' + day + '</span><span class="event-hl__when"><b>' + esc(mon) + "</b>" + (dow ? "<i>" + esc(dow) + (ev.time ? ", ore " + esc(ev.time) : "") + "</i>" : "") + "</span>"
+          : '<span class="event-hl__tba">' + esc(ev.when) + "</span>") + "</div>" +
+      "</div>" +
+      '<div class="event-hl__side">' +
+        '<p class="event-hl__blurb">' + esc(ev.blurb) + "</p>" +
+        '<dl class="event-hl__meta">' + meta.map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("") + "</dl>" +
+        (ev.sponsors ? '<p class="event-hl__sponsors"><span>Main sponsor</span> ' + esc(ev.sponsors) + "</p>" : "") +
+        '<div class="event-hl__actions"><button class="btn btn--forest btn--lg" type="button" data-open-form="event" data-event="' + esc(ev.id) + '">' + (open ? "Richiedi un posto" : "Segnala interesse") + "</button>" +
+        '<a class="event-hl__link" href="#calendario">Tutti gli incontri <span aria-hidden="true">→</span></a></div>' +
+      "</div>";
+    sec.hidden = false;
+    tidyText(box);
+    if (chip) {
+      chip.innerHTML = '<span class="hero__next-dot" aria-hidden="true"></span><span class="hero__next-k">Prossimo evento</span><span class="hero__next-t">' + esc(ev.title) +
+        (a ? " · " + a.getDate() + " " + MONTHS[a.getMonth()] : "") + ' <span aria-hidden="true">→</span></span>';
+      chip.hidden = false;
+    }
+  }
+  renderFeatured();
 
   var activeFilter = "all";
   var filtersEl = $("#event-filters");
@@ -349,6 +431,7 @@
         "</article>"
       );
     }).join("");
+    tidyText(listEl);
   }
 
   filtersEl.addEventListener("click", function (e) {
@@ -361,6 +444,7 @@
 
   renderFilters();
   renderEvents();
+  tidyText();
   observeReveal();
 
   /* ---------- Modal + form ---------- */

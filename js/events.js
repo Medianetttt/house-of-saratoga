@@ -2,6 +2,9 @@
  * House of Saratoga — configurazione e calendario incontri.
  *
  * Questo è l'UNICO file da toccare per cambiare gli incontri mostrati sul sito.
+ * In home, sotto l'hero, va in evidenza il PRIMO incontro non passato (ordinato per data); un incontro
+ * con data passata sparisce da solo, sia dall'evidenza sia dal calendario, il giorno dopo.
+ *
  * Quando ci sarà il backend, `HOS_EVENTS` potrà essere sostituito da una fetch
  * verso l'API e `endpoint` puntare all'endpoint che riceve le richieste.
  *
