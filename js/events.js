@@ -5,8 +5,8 @@
  * Quando ci sarà il backend, `HOS_EVENTS` potrà essere sostituito da una fetch
  * verso l'API e `endpoint` puntare all'endpoint che riceve le richieste.
  *
- * ATTENZIONE — contenuto segnaposto: la data del prossimo incontro NON è confermata
- * ed è mostrata sfocata finché non viene annunciata.
+ * Saratoga for Charity: dati dalla locandina ricevuta il 2026-11-22; data, ora e luogo (Monopoli)
+ * comunicati da Giuseppe lo stesso giorno. L'anno 2026 è dedotto (non scritto nel messaggio).
  */
 
 window.HOS_CONFIG = {
@@ -25,24 +25,29 @@ window.HOS_CONFIG = {
  *  when    testo mostrato quando la data non c'è ("Data in definizione")
  *  blurDate  true = mostra una data sfocata con la scritta "when" (incontro in arrivo)
  *  where   testo libero
- *  seats   numero di posti, oppure null se non comunicato
+ *  time    orario di inizio, testo libero (facoltativo)
+ *  price   quota di partecipazione, testo libero (facoltativo)
+ *  sponsors  sponsor principali, testo libero (facoltativo)
+ *  seats   numero di posti; se null la riga «Posti» non compare
  *  blurb   2 righe di descrizione
  *  status  "request"  → "Richiedi un posto"
  *          "interest" → "Segnala interesse" (incontro non ancora aperto)
  */
 window.HOS_EVENTS = [
   {
-    id: "prossimo-incontro",
-    type: "Prossimo incontro",
-    title: "Il prossimo incontro",
-    start: null,
+    id: "saratoga-for-charity",
+    type: "Pranzo spettacolo",
+    title: "Saratoga for Charity",
+    start: "2026-11-29",
     end: null,
-    blurDate: true, // data sfocata: "Annunciata a breve". Per annunciarla: metti start/end e togli blurDate.
-    when: "Annunciata a breve",
-    where: "Da annunciare",
+    when: "Domenica 29 novembre 2026",
+    where: "Ristorante Lido Bianco, Monopoli",
+    time: "13:00",
+    price: "€ 90 a ospite",
     seats: null,
     blurb:
-      "La data sarà annunciata a breve. Segnala il tuo interesse: ti scriveremo per primi, appena l’incontro sarà aperto.",
-    status: "interest",
+      "Pranzo spettacolo con Umberto Smaila e la sua band. Ospite d’onore Nicola Ventola, ex calciatore. Percorso gastronomico con selezione di vini in abbinamento. Il ricavato dell’asta di beneficenza sarà devoluto a due associazioni pugliesi che da anni si prendono cura dei bambini.",
+    sponsors: "Pommery · I Pastini · Rivera",
+    status: "request",
   },
 ];

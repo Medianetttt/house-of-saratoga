@@ -310,7 +310,10 @@
     }
     listEl.innerHTML = items.map(function (ev, i) {
       var open = ev.status !== "interest";
-      var seats = ev.seats ? ev.seats + " posti" : "Posti limitati";
+      var meta = [["Dove", ev.where]];
+      if (ev.time) meta.push(["Ore", ev.time]);
+      if (ev.price) meta.push(["Quota", ev.price]);
+      if (ev.seats) meta.push(["Posti", ev.seats + " posti"]);   // senza numero comunicato la riga non compare
       return (
         '<article class="ev" style="--i:' + i + '">' +
           '<div class="ev__date">' + dateBlock(ev) + "</div>" +
@@ -319,10 +322,10 @@
             '<span class="pill' + (open ? " pill--open" : "") + '">' + (open ? "Su richiesta" : "Prossimamente") + "</span></div>" +
             '<h4 class="ev__title">' + esc(ev.title) + "</h4>" +
             '<p class="ev__blurb">' + esc(ev.blurb) + "</p>" +
+            (ev.sponsors ? '<p class="ev__sponsors"><span>Main sponsor</span> ' + esc(ev.sponsors) + "</p>" : "") +
           "</div>" +
           '<dl class="ev__meta">' +
-            "<div><dt>Dove</dt><dd>" + esc(ev.where) + "</dd></div>" +
-            "<div><dt>Posti</dt><dd>" + esc(seats) + "</dd></div>" +
+            meta.map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd></div>"; }).join("") +
           "</dl>" +
           '<div class="ev__action"><button class="btn ' + (open ? "btn--sage" : "btn--ghost") + ' btn--sm" type="button" data-open-form="event" data-event="' + esc(ev.id) + '">' + (open ? "Richiedi un posto" : "Segnala interesse") + "</button></div>" +
         "</article>"

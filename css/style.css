@@ -431,6 +431,8 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 .ev__title { font-weight: 400; font-size: clamp(1.6rem, 1.3rem + 1.1vw, 2.2rem); line-height: 1.05; text-wrap: balance; margin-bottom: 8px; }
 .ev__blurb { opacity: .85; font-size: 1.05rem; line-height: 1.45; max-width: 34em; }
 
+.ev__sponsors { margin-top: 12px; font-family: var(--sans); font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; opacity: .75; }
+.ev__sponsors span { color: var(--sage-dim); margin-right: .8em; }
 .ev__meta { display: grid; gap: 8px; align-content: start; }
 .ev__meta div { display: grid; grid-template-columns: 4.5em 1fr; gap: 10px; align-items: baseline; }
 .ev__meta dt { font-family: var(--sans); font-size: .6rem; letter-spacing: .22em; text-transform: uppercase; color: var(--sage-dim); }
