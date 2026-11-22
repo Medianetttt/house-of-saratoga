@@ -185,6 +185,21 @@
   doc.addEventListener("keydown", function (e) { if (e.key === "Escape" && menu.classList.contains("is-open")) setMenu(false); });
   window.matchMedia("(min-width: 1100px)").addEventListener("change", function (m) { if (m.matches) setMenu(false); });
 
+  /* ---------- Video dell'hero ---------- */
+  (function () {
+    var v = $(".hero__video");
+    if (!v) return;
+    var conn = navigator.connection || {};
+    if (reduceMotion || conn.saveData) return;            // resta il poster fermo, nessun download del video
+    v.muted = true; v.preload = "auto";
+    v.addEventListener("playing", function () { v.classList.add("is-on"); });
+    function play() { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    if (!("IntersectionObserver" in window)) { play(); return; }
+    new IntersectionObserver(function (entries) {          // si ferma fuori schermo: meno batteria e CPU
+      entries.forEach(function (e) { if (e.isIntersecting) play(); else v.pause(); });
+    }, { threshold: 0.05 }).observe(v.closest(".hero"));
+  })();
+
   /* ---------- Reveal allo scroll ---------- */
   function observeReveal() {
     var items = $$(".reveal:not(.is-in)");
