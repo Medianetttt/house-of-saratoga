@@ -1,0 +1,4 @@
+Cormorant Garamond e Jost: caratteri open source con licenza SIL Open Font License 1.1
+(https://openfontlicense.org). File ottenuti da Google Fonts il 2026-11-22 (sottoinsieme «latin»,
+caratteri variabili) e serviti dal sito invece di caricarli dai server di Google.
+Il copyright appartiene ai rispettivi autori; la licenza consente uso, copia e ridistribuzione.

@@ -349,7 +349,7 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 .lightbox__fig img.is-loading { opacity: .35; }
 .lightbox__fig figcaption { font-family: var(--sans); font-size: .66rem; letter-spacing: .22em; text-transform: uppercase; color: var(--sage-dim); text-align: center; }
 .lightbox__fig figcaption b { font-weight: 400; color: var(--sage); margin-right: .9em; }
-.lightbox__btn { position: absolute; width: 48px; height: 48px; display: grid; place-items: center; background: none; border: 1px solid transparent; border-radius: 50%; color: var(--sage); cursor: pointer; transition: border-color .3s, background-color .3s; z-index: 2; }
+.lightbox__btn { position: absolute; width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 1px solid transparent; border-radius: 50%; color: var(--sage); cursor: pointer; transition: border-color .3s, background-color .3s; z-index: 2; }
 .lightbox__btn:hover { border-color: var(--line-dark); background: rgba(204, 219, 190, .08); }
 .lightbox__close { top: 14px; right: 14px; }
 .lightbox__prev, .lightbox__next { top: 50%; transform: translateY(-50%); }
@@ -485,6 +485,15 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 @media (min-width: 900px) { .steps { grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); } }
 .step { padding: var(--sp-2) 0; border-top: 1px solid rgba(231, 233, 227, .25); position: relative; }
 .step::before { content: ""; position: absolute; top: -1px; left: 0; width: 40px; height: 1px; background: var(--sage); }
+/* Barra di avanzamento (attiva solo con JS e senza movimento ridotto): la linea si riempie con lo scroll */
+.steps.is-live .step { --f: 0; }
+.steps.is-live .step::before { top: -2px; height: 3px; width: calc(40px + (100% - 40px) * var(--f)); box-shadow: 0 0 14px rgba(204, 219, 190, calc(.5 * var(--f))); }
+.steps.is-live .step::after { content: ""; position: absolute; top: -4px; left: calc(40px + (100% - 40px) * var(--f) - 3px); width: 7px; height: 7px; border-radius: 50%; background: var(--sage); box-shadow: 0 0 0 4px rgba(204, 219, 190, .16); opacity: 0; transition: opacity .25s; }
+.steps.is-live .step.is-on:not(.is-full)::after { opacity: 1; }
+.steps.is-live .step__n { color: var(--sage-dim); transition: color .3s; }
+.steps.is-live .step.is-on .step__n { color: var(--sage); }
+.steps.is-live .step__t, .steps.is-live .step p:last-child { opacity: calc(.4 + .6 * var(--f)); }
+.steps.is-live .step p:last-child { opacity: calc(.3 + .48 * var(--f)); }
 .step__n { font-family: var(--sans); font-size: .64rem; letter-spacing: .2em; color: var(--sage-dim); }
 .step__t { font-weight: 400; font-size: clamp(1.5rem, 1.25rem + .9vw, 2rem); margin: 4px 0 6px; line-height: 1.05; }
 .step p:last-child { opacity: .78; font-size: 1.02rem; line-height: 1.4; max-width: 20em; }
@@ -544,10 +553,12 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
   .modal[open] { animation-name: sheet-in; }
 }
 @keyframes sheet-in { from { opacity: 0; transform: translateY(40px); } }
-.modal__panel { padding: clamp(20px, 3vw, 32px); position: relative; }
-.modal__close { position: absolute; top: 6px; right: 6px; width: 40px; height: 40px; display: grid; place-items: center; background: none; border: 0; cursor: pointer; color: var(--forest); transition: transform .4s var(--ease); z-index: 2; }
-.modal__close:hover { transform: rotate(90deg); }
-.modal__head { display: grid; gap: 6px; margin-bottom: var(--sp-2); padding-right: 32px; justify-items: start; }
+.modal__panel { --mp: clamp(20px, 3vw, 32px); padding: var(--mp); position: relative; }
+/* Pulsante di chiusura: 44 px, centro allineato alla riga del titoletto, bordo della croce a filo con i campi. Stesso stile della lightbox. */
+.modal__close { position: absolute; top: calc(var(--mp) - 14px); right: calc(var(--mp) - 11px); width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 1px solid transparent; border-radius: 50%; cursor: pointer; color: var(--forest); transition: border-color .3s, background-color .3s; z-index: 2; }
+.modal__close:hover { border-color: rgba(30, 48, 22, .28); background: rgba(30, 48, 22, .06); }
+.modal.is-done .modal__close { top: calc(var(--mp) - 3px); }
+.modal__head { display: grid; gap: 6px; margin-bottom: var(--sp-2); padding-right: 44px; justify-items: start; }
 .modal__mark { display: none; }
 .modal__head .display { color: var(--forest); font-size: clamp(1.6rem, 1.4rem + .8vw, 2rem); }
 .modal__intro { color: var(--ink-soft); font-size: .98rem; line-height: 1.35; max-width: 32em; }
@@ -561,10 +572,9 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 .field input[type="text"], .field input[type="email"], .field input[type="tel"], .field input[type="url"], .field select, .field textarea {
   width: 100%; font-family: var(--serif); font-size: 1.1rem; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid rgba(30, 48, 22, .35); border-radius: 0; padding: 4px 0 6px; outline: none; transition: border-color .3s; -webkit-appearance: none; appearance: none; min-height: 36px;
 }
-.field textarea { resize: vertical; min-height: 3.6em; line-height: 1.35; border: 1px solid rgba(30, 48, 22, .35); padding: 8px 10px; }
+.field textarea { resize: vertical; min-height: 4.6em; line-height: 1.35; padding: 4px 0 6px; } /* sottolineato e a filo come gli altri campi */
 .field input::placeholder, .field textarea::placeholder { color: rgba(30, 48, 22, .66); font-style: italic; }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--forest); box-shadow: 0 1px 0 var(--forest); }
-.field textarea:focus { box-shadow: 0 0 0 1px var(--forest); }
 .field select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'><path d='M1 1l6 6 6-6' fill='none' stroke='%231e3016' stroke-width='1.2'/></svg>"); background-repeat: no-repeat; background-position: right 4px center; padding-right: 28px; cursor: pointer; }
 .field.has-error input, .field.has-error textarea { border-color: #8b2a1d; }
 .err { color: #8b2a1d; font-family: var(--sans); font-size: .72rem; letter-spacing: .02em; }
@@ -587,7 +597,7 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 @media (min-width: 620px) { .modal__foot .btn { width: auto; } }
 .modal .btn--lg { padding: 1.1em 1.8em; min-height: 44px; }
 .modal__legal { font-family: var(--sans); font-size: .68rem; letter-spacing: .04em; color: var(--moss); }
-.modal__done { display: grid; justify-items: start; gap: var(--sp-2); padding: clamp(20px, 3vw, 32px); }
+.modal__done { display: grid; justify-items: start; gap: var(--sp-2); padding: var(--mp); padding-right: calc(var(--mp) + 12px); }
 .modal__done[hidden] { display: none; }
 .modal__done .display { color: var(--forest); }
 .done__mark { width: 32px; color: var(--forest); }
@@ -661,3 +671,12 @@ p, li, summary, dd, figcaption, blockquote footer { text-wrap: pretty; }
 @media (max-width: 900px), (pointer: coarse) { .chip { min-height: 44px; } }
 .hero:has(.hero__next:not([hidden])) .hero__scroll { display: none; } /* la riga «Prossimo evento» fa già da invito a scorrere */
 .powered, .footer__top { padding-block: 15px; margin-block: -15px; }
+
+/* Pausa del video di sfondo (accessibilità: movimento automatico che dura più di 5 secondi) */
+.hero__pause { position: absolute; right: max(var(--gutter), 14px); bottom: 14px; z-index: 3; width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 1px solid var(--line-dark); border-radius: 50%; background: rgba(21, 34, 16, .5); color: var(--sage); cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: border-color .3s, background-color .3s; }
+.hero__pause[hidden] { display: none; }
+.hero__pause:hover { border-color: var(--sage); background: rgba(21, 34, 16, .75); }
+.hero__pause .ico-play { display: none; }
+.hero__pause.is-paused .ico-play { display: block; }
+.hero__pause.is-paused .ico-pause { display: none; }
+main:focus { outline: none; }

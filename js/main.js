@@ -21,14 +21,19 @@
       el.style.overflow = "hidden";
       var a = el.animate({ height: [from + "px", to + "px"] }, { duration: DURATION, easing: EASE });
       el._anim = a;
-      // Rete di sicurezza: se il browser sospende le animazioni (scheda in background), lo stato si chiude lo stesso.
-      setTimeout(function () { if (el._anim === a) a.finish(); }, DURATION + 120);
-      a.onfinish = function () {
-        if (el._anim !== a) return;
+      var ended = false;
+      function end() {
+        if (ended || el._anim !== a) return;
+        ended = true;
         el._anim = null;
         el.style.overflow = "";
         if (onEnd) onEnd();
-      };
+        try { a.cancel(); } catch (e) {}
+      }
+      // Rete di sicurezza: se il browser sospende le animazioni (scheda in background) l'evento di fine non arriva mai,
+      // quindi lo stato si chiude con un timer, senza aspettare i fotogrammi.
+      setTimeout(end, DURATION + 120);
+      a.onfinish = end;
     }
 
     function openItem(el) {
@@ -172,17 +177,22 @@
   /* ---------- Menu mobile ---------- */
   var burger = $(".burger");
   var menu = $("#menu");
-  function setMenu(open) {
+  function setMenu(open, returnFocus) {
+    var was = menu.classList.contains("is-open");
     burger.setAttribute("aria-expanded", String(open));
     burger.setAttribute("aria-label", open ? "Chiudi il menu" : "Apri il menu");
     menu.classList.toggle("is-open", open);
     doc.body.classList.toggle("is-locked", open);
     doc.body.classList.toggle("menu-open", open);
     if (open) menu.hidden = false;
+    // Con il menu aperto il resto della pagina non è raggiungibile né con Tab né con il lettore di schermo.
+    ["main", "footer"].forEach(function (s) { var el = $(s); if (el) el.inert = open; });
+    if (open && !was) setTimeout(function () { var f = $("a", menu); if (f) f.focus({ preventScroll: true }); }, 80);
+    if (!open && was && returnFocus) burger.focus({ preventScroll: true });
   }
-  burger.addEventListener("click", function () { setMenu(burger.getAttribute("aria-expanded") !== "true"); });
+  burger.addEventListener("click", function () { setMenu(burger.getAttribute("aria-expanded") !== "true", true); });
   $$("a", menu).forEach(function (a) { a.addEventListener("click", function () { setMenu(false); }); });
-  doc.addEventListener("keydown", function (e) { if (e.key === "Escape" && menu.classList.contains("is-open")) setMenu(false); });
+  doc.addEventListener("keydown", function (e) { if (e.key === "Escape" && menu.classList.contains("is-open")) setMenu(false, true); });
   window.matchMedia("(min-width: 1100px)").addEventListener("change", function (m) { if (m.matches) setMenu(false); });
 
   /* ---------- Video dell'hero ---------- */
@@ -195,11 +205,29 @@
     // essere nascosto: alcuni browser (Safari, risparmio energetico) non avviano i video invisibili.
     v.muted = true; v.defaultMuted = true; v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
     v.preload = "auto";
-    var onScreen = true;
+    var onScreen = true, userPaused = false;
+    var pauseBtn = $(".hero__pause");
+    try { userPaused = sessionStorage.getItem("hosVideoPaused") === "1"; } catch (e) {}
     function play() {
-      if (!onScreen || document.hidden || !v.paused) return;
+      if (!onScreen || userPaused || document.hidden || !v.paused) return;
       var p = v.play();
       if (p && p.catch) p.catch(function () {});
+    }
+    // Pulsante pausa/riproduci (movimento che parte da solo e dura più di 5 secondi: va sempre potuto fermare). La scelta vale per la visita.
+    function setUserPaused(p) {
+      userPaused = p;
+      try { sessionStorage.setItem("hosVideoPaused", p ? "1" : "0"); } catch (e) {}
+      if (pauseBtn) {
+        pauseBtn.setAttribute("aria-pressed", String(p));
+        pauseBtn.setAttribute("aria-label", p ? "Riproduci il video di sfondo" : "Metti in pausa il video di sfondo");
+        pauseBtn.classList.toggle("is-paused", p);
+      }
+      if (p) v.pause(); else play();
+    }
+    if (pauseBtn) {
+      pauseBtn.hidden = false;
+      setUserPaused(userPaused);
+      pauseBtn.addEventListener("click", function () { setUserPaused(!userPaused); });
     }
     ["loadeddata", "canplay"].forEach(function (n) { v.addEventListener(n, play); });
     // Se il browser blocca l'avvio automatico (es. risparmio energetico), riprova al primo gesto.
@@ -287,6 +315,34 @@
       }
     });
   }
+
+  /* ---------- Ammissione: la barra di separazione cresce con lo scroll ---------- */
+  // Ogni passo ha sopra una linea che si riempie (--f da 0 a 1) man mano che si scorre; i passi raggiunti si accendono.
+  // Con i passi affiancati (desktop) la barra corre in sequenza da uno al successivo; in colonna (mobile) ogni passo si riempie quando arriva.
+  // Con «movimento ridotto» resta tutto pieno e fermo.
+  (function () {
+    var box = $(".steps"), steps = $$(".steps .step");
+    if (!box || !steps.length || reduceMotion) return;
+    var ticking = false;
+    function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight, n = steps.length;
+      var row = n > 1 && steps[0].offsetTop === steps[1].offsetTop;
+      var p = row ? clamp((vh * 0.92 - box.getBoundingClientRect().top) / (vh * 0.5)) : 0;
+      steps.forEach(function (s, i) {
+        var f = row ? clamp(p * n - i) : clamp((vh * 0.9 - s.getBoundingClientRect().top) / (vh * 0.32));
+        s.style.setProperty("--f", f.toFixed(3));
+        s.classList.toggle("is-on", f > 0.02);
+        s.classList.toggle("is-full", f >= 0.999);
+      });
+    }
+    function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener("scroll", req, { passive: true });
+    window.addEventListener("resize", req);
+    box.classList.add("is-live");
+    update();
+  })();
 
   /* ---------- Incontri ---------- */
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -456,6 +512,7 @@
   var formError = $("#form-error");
   var done = $("#modal-done");
   var lastTrigger = null;
+  var openedAt = 0;                   // quando si è aperto il modulo (anti-bot: nessun umano lo compila in meno di 3 secondi)
 
   // Opzioni del select "Incontro": nessuno + ogni incontro.
   selEvent.innerHTML =
@@ -494,12 +551,18 @@
     if (typeof modal.showModal === "function") modal.showModal(); else modal.setAttribute("open", "");
     doc.body.classList.add("is-locked");
     modal.scrollTop = 0;
+    openedAt = Date.now();
+    // Col mouse il cursore va subito sul primo campo; sul telefono no, per non aprire la tastiera a sorpresa.
+    if (window.matchMedia("(pointer: fine)").matches && form.elements.firstName) form.elements.firstName.focus({ preventScroll: true });
   }
-  function closeModal() { if (modal.open) modal.close(); }
-  modal.addEventListener("close", function () {
+  // Pulizia alla chiusura: sblocca lo scroll e riporta il fuoco al pulsante che ha aperto il modulo.
+  // Si fa subito (non solo sull'evento "close", che il browser può ritardare) e vale anche per Esc, che passa dall'evento.
+  function afterClose() {
     doc.body.classList.remove("is-locked");
     if (lastTrigger && doc.contains(lastTrigger)) lastTrigger.focus({ preventScroll: true });
-  });
+  }
+  function closeModal() { if (modal.open) { modal.close(); afterClose(); } }
+  modal.addEventListener("close", afterClose);
   // Click sul fondo scuro = chiudi
   modal.addEventListener("mousedown", function (e) {
     if (e.target === modal) closeModal();
@@ -530,7 +593,7 @@
     lastName: function (v) { return v.trim() ? "" : "Inserisci il tuo cognome."; },
     email: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? "" : "Inserisci un indirizzo email valido."; },
     role: function (v) { return v.trim() ? "" : "Raccontaci di cosa ti occupi."; },
-    instagram: function (v) { return igHandle(v) ? "" : "Inserisci il tuo profilo Instagram: @nomeprofilo oppure il link."; },
+    instagram: function (v) { return igHandle(v) ? "" : "Inserisci @nomeprofilo o il link."; },
     note: function (v) { return v.trim().length >= 20 ? "" : "Scrivi almeno due righe: ci aiuta a conoscerti."; },
     consent: function (v, el) { return el.checked ? "" : "Per procedere serve il tuo consenso."; },
   };
@@ -570,21 +633,27 @@
     el.addEventListener("change", function () { if (el.closest(".has-error")) setError(name, rules[name](el.value || "", el)); });
   });
 
+  // Pulizia lato browser (il server deve comunque ripetere la validazione): toglie i caratteri di controllo e taglia alla lunghezza massima.
+  function clean(v, max) {
+    var t = String(v == null ? "" : v).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
+    t = t.split(String.fromCharCode(8232)).join(" ").split(String.fromCharCode(8233)).join(" ");   // separatori di riga/paragrafo Unicode
+    return t.trim().slice(0, max);
+  }
   function collect() {
     var fd = new FormData(form);
-    var ev = eventById(fd.get("event"));
+    var ev = eventById(clean(fd.get("event"), 80));
     return {
       kind: ev ? (ev.status === "interest" ? "event-interest" : "event-request") : "invite-request",
       eventId: ev ? ev.id : null,
       eventTitle: ev ? ev.title : null,
-      firstName: fd.get("firstName").trim(),
-      lastName: fd.get("lastName").trim(),
-      email: fd.get("email").trim(),
-      phone: (fd.get("phone") || "").trim(),
-      role: fd.get("role").trim(),
+      firstName: clean(fd.get("firstName"), 60),
+      lastName: clean(fd.get("lastName"), 60),
+      email: clean(fd.get("email"), 120),
+      phone: clean(fd.get("phone"), 30),
+      role: clean(fd.get("role"), 120),
       instagram: "@" + igHandle(fd.get("instagram")),
-      referral: (fd.get("referral") || "").trim(),
-      note: fd.get("note").trim(),
+      referral: clean(fd.get("referral"), 100),
+      note: clean(fd.get("note"), 800),
       consent: true,
       language: doc.documentElement.lang,
       submittedAt: new Date().toISOString(),
@@ -593,11 +662,12 @@
   }
 
   function showDone(demo) {
+    var ev = eventById(selEvent.value);
+    form.reset();                      // dopo l'invio i dati non restano nel modulo (computer condivisi)
     form.hidden = true;
     modal.classList.add("is-done");
     done.hidden = false;
     $("#demo-note").hidden = !demo;
-    var ev = eventById(selEvent.value);
     $("#done-title").textContent = ev && ev.status === "interest" ? "Interesse registrato." : "Richiesta ricevuta.";
     modal.scrollTop = 0;
     $("#done-title").focus({ preventScroll: true });
@@ -606,31 +676,43 @@
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     formError.textContent = "";
-    if (form.elements.website.value) return;          // honeypot compilato: è un bot
+    if (submitBtn.disabled) return;                    // invio già in corso: niente doppi invii
     if (!validate()) return;
+    // Anti-bot: campo trappola compilato, oppure modulo inviato in meno di 3 secondi dall'apertura.
+    // Al bot si risponde come se fosse andato tutto bene, senza inviare nulla.
+    if (form.elements.website.value || Date.now() - openedAt < 3000) { showDone(!CONFIG.endpoint); return; }
 
     var payload = collect();
     submitBtn.disabled = true;
     submitBtn.textContent = "Invio in corso…";
+    function fail(msg) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Invia la richiesta";
+      formError.textContent = msg || "Non siamo riusciti a inviare la richiesta. Riprova tra un momento.";
+    }
 
-    // Modalità demo: nessun endpoint configurato → niente lascia il browser.
+    // Modalità demo: nessun endpoint configurato → niente lascia il browser (e nessun dato finisce in console).
     if (!CONFIG.endpoint) {
-      console.info("[House of Saratoga] Modalità demo, richiesta non inviata:", payload);
       setTimeout(function () { showDone(true); }, 600);
       return;
     }
+    // L'endpoint deve essere https (o un percorso dello stesso sito, o localhost per le prove): mai dati personali in chiaro.
+    if (!/^(https:\/\/|\/(?!\/)|http:\/\/(localhost|127\.0\.0\.1)[:\/])/i.test(CONFIG.endpoint)) { fail("Il servizio di invio non è configurato correttamente."); return; }
 
+    var ctrl = "AbortController" in window ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);
     fetch(CONFIG.endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      credentials: "omit",            // niente cookie né credenziali
+      cache: "no-store",
+      referrerPolicy: "no-referrer",
+      redirect: "error",              // un reindirizzamento non deve portare i dati altrove
+      signal: ctrl ? ctrl.signal : undefined,
     }).then(function (r) {
       if (!r.ok) throw new Error("HTTP " + r.status);
       showDone(false);
-    }).catch(function () {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Invia la richiesta";
-      formError.textContent = "Non siamo riusciti a inviare la richiesta. Riprova tra un momento.";
-    });
+    }).catch(function () { fail(); }).then(function () { clearTimeout(timer); });
   });
 })();

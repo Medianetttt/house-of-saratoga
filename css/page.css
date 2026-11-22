@@ -1,0 +1,9 @@
+/* Pagine semplici (privacy e 404): stessa tavolozza e gli stessi caratteri della home, nessuno stile in linea. */
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; background: #1e3016; color: #ccdbbe; font-family: "Cormorant Garamond", Garamond, Georgia, serif; text-align: center; padding: 32px; }
+main { max-width: 34rem; }
+.seal { display: block; width: 84px; height: 84px; margin: 0 auto 28px; background-color: #ccdbbe; -webkit-mask: url("../assets/seal.png") center / contain no-repeat; mask: url("../assets/seal.png") center / contain no-repeat; opacity: .9; }
+h1 { font-weight: 300; font-style: italic; font-size: clamp(2.2rem, 6vw, 3.4rem); margin: 0 0 16px; text-wrap: balance; }
+p { font-size: 1.25rem; line-height: 1.5; margin: 0 0 28px; opacity: .85; text-wrap: pretty; }
+a { color: inherit; font-family: "Jost", "Helvetica Neue", Arial, sans-serif; font-size: .75rem; letter-spacing: .22em; text-transform: uppercase; padding: 14px 6px; display: inline-block; }
+a:focus-visible { outline: 1.5px solid #ccdbbe; outline-offset: 4px; }
