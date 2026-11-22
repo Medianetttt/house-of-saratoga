@@ -187,8 +187,7 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
   filter: grayscale(1) contrast(1.1) brightness(.85); opacity: .34;
   -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 46%, #000 30%, transparent 92%); mask-image: radial-gradient(ellipse 90% 80% at 50% 46%, #000 30%, transparent 92%);
 }
-.hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; opacity: 0; transition: opacity 1.6s ease; }
-.hero__video.is-on { opacity: 1; }
+.hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; } /* il poster dell'elemento resta visibile finché non parte */
 .hero__inner { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2.4svh, 26px); }
 .hero__eyebrow { justify-content: center; }
 .hero__seal { width: min(40svh, 66vw, 400px); color: var(--sage); will-change: transform, opacity; }

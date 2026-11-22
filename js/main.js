@@ -191,13 +191,31 @@
     if (!v) return;
     var conn = navigator.connection || {};
     if (reduceMotion || conn.saveData) return;            // resta il poster fermo, nessun download del video
-    v.muted = true; v.preload = "auto";
-    v.addEventListener("playing", function () { v.classList.add("is-on"); });
-    function play() { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
-    if (!("IntersectionObserver" in window)) { play(); return; }
-    new IntersectionObserver(function (entries) {          // si ferma fuori schermo: meno batteria e CPU
-      entries.forEach(function (e) { if (e.isIntersecting) play(); else v.pause(); });
-    }, { threshold: 0.05 }).observe(v.closest(".hero"));
+    // Il video parte subito, senza aspettare l'osservatore (che scatta solo a pagina disegnata) e senza
+    // essere nascosto: alcuni browser (Safari, risparmio energetico) non avviano i video invisibili.
+    v.muted = true; v.defaultMuted = true; v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
+    v.preload = "auto";
+    var onScreen = true;
+    function play() {
+      if (!onScreen || document.hidden || !v.paused) return;
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {});
+    }
+    ["loadeddata", "canplay"].forEach(function (n) { v.addEventListener(n, play); });
+    // Se il browser blocca l'avvio automatico (es. risparmio energetico), riprova al primo gesto.
+    var gestures = ["pointerdown", "keydown", "touchstart", "wheel", "scroll"];
+    function retry() { play(); }
+    gestures.forEach(function (n) { window.addEventListener(n, retry, { passive: true }); });
+    v.addEventListener("playing", function () {
+      gestures.forEach(function (n) { window.removeEventListener(n, retry); });
+    });
+    doc.addEventListener("visibilitychange", function () { if (document.hidden) v.pause(); else play(); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) {        // si ferma fuori schermo: meno batteria e CPU
+        entries.forEach(function (e) { onScreen = e.isIntersecting; if (onScreen) play(); else v.pause(); });
+      }, { threshold: 0.05 }).observe(v.closest(".hero"));
+    }
+    play();
   })();
 
   /* ---------- Reveal allo scroll ---------- */
