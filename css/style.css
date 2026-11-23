@@ -181,47 +181,29 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
   content: ""; position: absolute; inset: 0; z-index: -1; opacity: .07; mix-blend-mode: screen; pointer-events: none;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
-.hero__bg { /* sfondo: il video della House (poster fermo se il movimento è ridotto), in bianco e nero sotto il verde */
+.hero__bg { /* sfondo: il video della House a colori naturali (poster fermo se il movimento è ridotto), solo scurito da un effetto ombra */
   position: absolute; inset: 0; z-index: -2; pointer-events: none; overflow: hidden;
   background: url("../assets/video/hero-poster.jpg") center 40% / cover no-repeat;
-  filter: grayscale(1) contrast(1.1) brightness(.85); opacity: .34;
-  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 46%, #000 30%, transparent 92%); mask-image: radial-gradient(ellipse 90% 80% at 50% 46%, #000 30%, transparent 92%);
 }
+.hero__bg::after { /* ombra: più scura in alto (intestazione) e in basso, più leggera al centro; a lato un leggero bordo scuro */
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 45%, rgba(8, 11, 7, .06) 35%, rgba(8, 11, 7, .42) 100%),
+    linear-gradient(180deg, rgba(8, 11, 7, .66) 0%, rgba(8, 11, 7, .5) 34%, rgba(8, 11, 7, .56) 66%, rgba(8, 11, 7, .86) 100%);
+}
+.hero__eyebrow, .hero__line { text-shadow: 0 1px 16px rgba(0, 0, 0, .5); }   /* leggibilità sui fotogrammi più chiari */
+.hero .btn--ghost { background: rgba(8, 11, 7, .38); }
 .hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; } /* il poster dell'elemento resta visibile finché non parte */
 .hero__inner { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2.4svh, 26px); }
 .hero__eyebrow { justify-content: center; }
-.hero__seal { width: min(40svh, 66vw, 400px); color: var(--sage); will-change: transform, opacity; }
+.hero__seal { width: min(28svh, 46vw, 260px); color: var(--sage); will-change: transform, opacity; }
 .hero__seal .mark { width: 100%; }
 .hero__line { font-size: clamp(1.7rem, 1.1rem + 2.6vw, 3.2rem); font-style: italic; font-weight: 300; line-height: 1.12; letter-spacing: -.005em; margin-top: clamp(4px, 1.4svh, 16px); }
 .hero__cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: clamp(4px, 1.6svh, 18px); }
 .br-sm { display: none; }
 @media (max-width: 560px) { .br-sm { display: inline; } .hero__cta .btn { width: 100%; max-width: 320px; } }
 
-/* Radar: nasce dal cerchio esterno del sigillo (stesso centro, stesso diametro).
-   Una lancetta ruota dentro il cerchio; a ogni giro un anello parte dal bordo e si allarga. */
-.hero__seal { position: relative; }
-.radar { position: absolute; left: 50%; top: 50%; width: 100%; aspect-ratio: 1; transform: translate(-50%, -50%); z-index: -1; pointer-events: none; }
-.radar i { position: absolute; inset: 0; border-radius: 50%; }
-.radar::before, .radar::after { /* assi, come il mirino di un radar */
-  content: ""; position: absolute; left: 50%; top: 50%; background: var(--sage); opacity: .12;
-  -webkit-mask: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent); mask: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent);
-}
-.radar::before { width: 260%; height: 1px; transform: translate(-50%, -50%); }
-.radar::after { width: 1px; height: 260%; transform: translate(-50%, -50%); -webkit-mask: linear-gradient(0deg, transparent, #000 30%, #000 70%, transparent); mask: linear-gradient(0deg, transparent, #000 30%, #000 70%, transparent); }
-.radar__range { border: 1px solid var(--sage); opacity: .1; }
-.radar__range:nth-of-type(1) { transform: scale(1.5); }
-.radar__range:nth-of-type(2) { transform: scale(2.05); opacity: .07; }
-.radar__sweep {
-  background: conic-gradient(from 0deg, rgba(204, 219, 190, 0) 0deg, rgba(204, 219, 190, 0) 250deg, rgba(204, 219, 190, .13) 345deg, rgba(204, 219, 190, .38) 360deg);
-  animation: sweep 6s linear infinite;
-}
-.radar__sweep::after { /* bordo d'attacco della lancetta */
-  content: ""; position: absolute; left: 50%; top: 0; width: 1px; height: 50%; background: linear-gradient(var(--sage), rgba(204, 219, 190, 0)); opacity: .55; transform-origin: bottom;
-}
-.radar__ping { border: 1.5px solid var(--sage); opacity: 0; animation: ping 6s cubic-bezier(.2, .6, .3, 1) infinite; }
-.radar__ping:last-of-type { animation-delay: 3s; }
-@keyframes sweep { to { transform: rotate(360deg); } }
-@keyframes ping { 0% { opacity: .5; transform: scale(1); } 100% { opacity: 0; transform: scale(2.3); } }
+/* (L'effetto radar attorno al sigillo è stato tolto il 2026-11-23 su richiesta del cliente.) */
 
 .hero__scroll { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: grid; justify-items: center; gap: 10px; text-decoration: none; font-family: var(--sans); font-size: .62rem; letter-spacing: .3em; text-transform: uppercase; opacity: .6; }
 .hero__scroll i { width: 1px; height: 38px; background: linear-gradient(var(--sage), transparent); transform-origin: top; animation: drip 2.6s var(--ease) infinite; }
@@ -611,7 +593,6 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   .js .reveal { opacity: 1; transform: none; }
-  .radar__sweep, .radar__ping { display: none; }
   .ev__blur { animation: none; }
   .gal__item { animation: none; }
   .gal__item img { transition: none; }
