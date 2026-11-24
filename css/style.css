@@ -196,7 +196,7 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 .hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; } /* il poster dell'elemento resta visibile finché non parte */
 .hero__inner { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2.4svh, 26px); }
 .hero__eyebrow { justify-content: center; }
-.hero__seal { width: min(28svh, 46vw, 260px); color: var(--sage); will-change: transform, opacity; }
+.hero__seal { width: min(28svh, 46vw, 260px); color: #fff; will-change: transform, opacity; }
 .hero__seal .mark { width: 100%; }
 .hero__line { font-size: clamp(1.7rem, 1.1rem + 2.6vw, 3.2rem); font-style: italic; font-weight: 300; line-height: 1.12; letter-spacing: -.005em; margin-top: clamp(4px, 1.4svh, 16px); }
 .hero__cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: clamp(4px, 1.6svh, 18px); }
