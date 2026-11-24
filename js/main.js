@@ -61,87 +61,83 @@
     });
   })();
 
-  /* ---------- Gallery: filtri, "mostra tutte", ingrandimento ---------- */
+  /* ---------- Dagli eventi: un banner per ogni capitolo, striscia di foto, ingrandimento ---------- */
   (function () {
     var data = window.HOS_GALLERY;
-    var grid = $("#gal");
-    if (!data || !grid) return;
-    var SETS = data.sets, PHOTOS = data.photos;
-    var filtersEl = $("#gal-filters");
-    var thumb = $("#gal-thumb"), countEl2 = $("#gal-count");
-    var btnPrev = $('[data-gal="prev"]'), btnNext = $('[data-gal="next"]');
+    var root = $("#chapters");
+    if (!data || !root) return;
+    var CH = data.chapters || [];
     var lb = $("#lightbox"), lbImg = $("#lb-img"), lbCap = $("#lb-cap");
-    var active = "all", current = 0, list = PHOTOS;
+    var cur = { c: 0, i: 0 };
 
-    function label(p) { return SETS[p.set] || ""; }
-    function filtered() { return active === "all" ? PHOTOS : PHOTOS.filter(function (p) { return p.set === active; }); }
+    function url(kind, id) { return "assets/gallery/" + kind + "/" + id + ".jpg"; }
+    var ARROW_L = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>';
+    var ARROW_R = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>';
 
-    function renderFilters() {
-      var keys = Object.keys(SETS).filter(function (k) { return PHOTOS.some(function (p) { return p.set === k; }); });
-      var chips = [["all", "Tutte", PHOTOS.length]].concat(keys.map(function (k) {
-        return [k, SETS[k], PHOTOS.filter(function (p) { return p.set === k; }).length];
-      }));
-      filtersEl.innerHTML = chips.map(function (c) {
-        return '<button type="button" class="chip" data-gfilter="' + esc(c[0]) + '" aria-pressed="' + (c[0] === active) + '">' + esc(c[1]) + " <small>" + c[2] + "</small></button>";
+    root.innerHTML = CH.map(function (c, ci) {
+      var n = c.photos.length;
+      var tiles = c.photos.map(function (p, i) {
+        return '<button type="button" class="gal__item" data-c="' + ci + '" data-i="' + i + '" aria-label="Ingrandisci foto ' + (i + 1) + " di " + n + " · " + esc(c.title) + '">' +
+          '<img src="' + url("grid", p.id) + '" width="' + p.w + '" height="' + p.h + '" alt="" loading="lazy" decoding="async"></button>';
       }).join("");
-    }
+      return '<article class="chapter reveal" id="chapter-' + c.n + '" aria-labelledby="chapter-' + c.n + '-t">' +
+        '<div class="chapter__banner">' +
+          '<img class="chapter__cover" data-pos="' + esc(c.coverPos || "50% 50%") + '" src="' + url("full", c.cover) + '" alt="" loading="lazy" decoding="async">' +
+          '<div class="chapter__txt">' +
+            '<p class="chapter__k" lang="en">Chapter ' + c.n + "</p>" +
+            '<h3 class="chapter__t" id="chapter-' + c.n + '-t" lang="en">' + esc(c.title) + "</h3>" +
+            '<p class="chapter__meta">' + (c.meta ? esc(c.meta) + " · " : "") + n + " foto</p>" +
+          "</div>" +
+          '<button type="button" class="chapter__open" data-c="' + ci + '" data-i="0" aria-label="Guarda le foto: Chapter ' + c.n + ", " + esc(c.title) + '"><span>Guarda le foto</span> <span aria-hidden="true">→</span></button>' +
+        "</div>" +
+        '<div class="chapter__bar"><span class="chapter__count">Tutte le foto del capitolo</span>' +
+          '<div class="gal-nav"><button class="gal-nav__btn" type="button" data-step="-1" aria-label="Foto precedenti">' + ARROW_L + '</button>' +
+          '<button class="gal-nav__btn" type="button" data-step="1" aria-label="Foto successive">' + ARROW_R + "</button></div></div>" +
+        '<div class="gal" tabindex="0" role="region" aria-label="Foto del capitolo ' + c.n + ": " + esc(c.title) + '. Scorri di lato">' + tiles + "</div>" +
+      "</article>";
+    }).join("");
+    $$(".chapter__cover", root).forEach(function (img) { img.style.objectPosition = img.getAttribute("data-pos"); });
 
-    function renderGrid() {
-      list = filtered();
-      grid.innerHTML = list.map(function (p, i) {
-        return '<button type="button" class="gal__item" data-i="' + i + '" aria-label="Ingrandisci foto ' + (i + 1) + " di " + list.length + " · " + esc(label(p)) + '">' +
-          '<img src="assets/gallery/grid/' + p.id + '.jpg" width="' + p.w + '" height="' + p.h + '" alt="Foto della serata ' + esc(label(p)) + '" loading="lazy" decoding="async">' +
-          '<span class="gal__tag">' + esc(label(p)) + "</span></button>";
-      }).join("");
-      grid.scrollLeft = 0;
-      countEl2.textContent = list.length + (list.length === 1 ? " foto" : " foto");
-      updateStrip();
+    /* Frecce di ogni striscia */
+    function updateNav(strip) {
+      var art = strip.closest(".chapter"), max = strip.scrollWidth - strip.clientWidth;
+      var prev = $('[data-step="-1"]', art), next = $('[data-step="1"]', art);
+      prev.disabled = strip.scrollLeft <= 4;
+      next.disabled = max <= 4 || strip.scrollLeft >= max - 4;
     }
-
-    /* Barra di avanzamento e frecce della striscia */
-    function updateStrip() {
-      var sw = grid.scrollWidth, cw = grid.clientWidth, max = sw - cw;
-      var w = sw ? Math.min(100, (cw / sw) * 100) : 100;
-      thumb.style.width = w.toFixed(1) + "%";
-      thumb.style.left = (max > 0 ? (grid.scrollLeft / max) * (100 - w) : 0).toFixed(1) + "%";
-      btnPrev.disabled = grid.scrollLeft <= 4;
-      btnNext.disabled = max <= 4 || grid.scrollLeft >= max - 4;
-    }
-    grid.addEventListener("scroll", function () { requestAnimationFrame(updateStrip); }, { passive: true });
-    window.addEventListener("resize", updateStrip);
-    function step(dir) {
-      var it = $(".gal__item", grid);
-      var d = it ? it.getBoundingClientRect().width + 14 : 300;
-      grid.scrollBy({ left: dir * d * 2, behavior: reduceMotion ? "auto" : "smooth" });
-    }
-    btnPrev.addEventListener("click", function () { step(-1); });
-    btnNext.addEventListener("click", function () { step(1); });
-
-    filtersEl.addEventListener("click", function (e) {
-      var b = e.target.closest("[data-gfilter]");
-      if (!b) return;
-      active = b.getAttribute("data-gfilter");
-      $$(".chip", filtersEl).forEach(function (c) { c.setAttribute("aria-pressed", String(c === b)); });
-      renderGrid();
+    $$(".gal", root).forEach(function (strip) {
+      strip.addEventListener("scroll", function () { requestAnimationFrame(function () { updateNav(strip); }); }, { passive: true });
+      updateNav(strip);
     });
-    grid.addEventListener("click", function (e) {
-      var b = e.target.closest("[data-i]");
-      if (b) openAt(+b.getAttribute("data-i"));
+    window.addEventListener("resize", function () { $$(".gal", root).forEach(updateNav); });
+
+    root.addEventListener("click", function (e) {
+      var s = e.target.closest("[data-step]");
+      if (s) {
+        var strip = $(".gal", s.closest(".chapter")), it = $(".gal__item", strip);
+        var d = it ? it.getBoundingClientRect().width + 10 : 260;
+        strip.scrollBy({ left: +s.getAttribute("data-step") * d * 2, behavior: reduceMotion ? "auto" : "smooth" });
+        return;
+      }
+      var b = e.target.closest("[data-c]");
+      if (b) openAt(+b.getAttribute("data-c"), +b.getAttribute("data-i"));
     });
 
-    /* Ingrandimento */
-    function show(i) {
-      current = (i + list.length) % list.length;
-      var p = list[current];
+    /* Ingrandimento: si sfoglia dentro il capitolo */
+    function show(c, i) {
+      var ch = CH[c], list = ch.photos, n = list.length;
+      i = (i + n) % n;
+      cur = { c: c, i: i };
+      var p = list[i];
       lbImg.classList.add("is-loading");
       lbImg.onload = function () { lbImg.classList.remove("is-loading"); };
-      lbImg.src = "assets/gallery/full/" + p.id + ".jpg";
-      lbImg.alt = "Foto della serata " + label(p);
-      lbCap.innerHTML = "<b>" + esc(label(p)) + "</b>" + (current + 1) + " / " + list.length;
-      [1, -1].forEach(function (d) { var n = list[(current + d + list.length) % list.length]; new Image().src = "assets/gallery/full/" + n.id + ".jpg"; });
+      lbImg.src = url("full", p.id);
+      lbImg.alt = ch.title + " — foto " + (i + 1) + " di " + n;
+      lbCap.innerHTML = '<b lang="en">Chapter ' + ch.n + "</b>" + (i + 1) + " / " + n;
+      [1, -1].forEach(function (d) { new Image().src = url("full", list[(i + d + n) % n].id); });
     }
-    function openAt(i) {
-      show(i);
+    function openAt(c, i) {
+      show(c, i);
       if (!lb.open) lb.showModal();
       document.body.classList.add("is-locked");
     }
@@ -149,23 +145,20 @@
     lb.addEventListener("close", function () { document.body.classList.remove("is-locked"); });
     lb.addEventListener("click", function (e) {
       var b = e.target.closest("[data-lb]");
-      if (b) { var a = b.getAttribute("data-lb"); if (a === "close") closeLb(); else show(current + (a === "next" ? 1 : -1)); return; }
+      if (b) { var a = b.getAttribute("data-lb"); if (a === "close") closeLb(); else show(cur.c, cur.i + (a === "next" ? 1 : -1)); return; }
       if (e.target === lb || e.target.classList.contains("lightbox__fig")) closeLb(); // clic sullo sfondo
     });
     lb.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowRight") { e.preventDefault(); show(current + 1); }
-      else if (e.key === "ArrowLeft") { e.preventDefault(); show(current - 1); }
+      if (e.key === "ArrowRight") { e.preventDefault(); show(cur.c, cur.i + 1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); show(cur.c, cur.i - 1); }
     });
     var x0 = null;
     lb.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
     lb.addEventListener("touchend", function (e) {
       if (x0 === null) return;
       var dx = e.changedTouches[0].clientX - x0; x0 = null;
-      if (Math.abs(dx) > 50) show(current + (dx < 0 ? 1 : -1));
+      if (Math.abs(dx) > 50) show(cur.c, cur.i + (dx < 0 ? 1 : -1));
     }, { passive: true });
-
-    renderFilters();
-    renderGrid();
   })();
 
   /* ---------- Header: sfondo dopo lo scroll ---------- */

@@ -1,50 +1,60 @@
 /*
- * House of Saratoga — foto della gallery.
- * Le immagini stanno in assets/gallery/grid (anteprime) e assets/gallery/full (ingrandimento).
- * Per aggiungerne una: copia i due file con lo stesso nome e aggiungi una riga qui sotto.
+ * House of Saratoga — capitoli della sezione «Dagli eventi».
+ * Un banner per ogni evento già fatto, con le sue foto. Le immagini stanno in assets/gallery/grid (anteprime) e
+ * assets/gallery/full (ingrandimento e banner). Per aggiungere una foto: copia i due file con lo stesso nome e
+ * aggiungi una riga in `photos`; per un nuovo capitolo: aggiungi un oggetto a `chapters`.
  *
- * sets: formato "chiave": "Nome mostrato". Le foto di "incontri" sono senza evento dichiarato.
- * Fonte: cartella Drive «HOS» condivisa da Giuseppe (solo foto, niente video) più 4 foto allegate in chat il 2026-11-16.
+ *  title   titolo del capitolo (come scritto dal cliente)
+ *  meta    riga sotto il titolo (facoltativa: solo dati confermati)
+ *  cover   id della foto usata per il banner; coverPos = posizione del ritaglio ("x% y%")
+ *  photos  id, larghezza e altezza dell'immagine ingrandita
+ *
+ * Fonte: selezione foto del cliente nella cartella Drive «HOS» → «Selezione foto chapter sito» (2026-11-23):
+ * capitolo 1 «Terrazza dei tuffi» (4 file), capitolo 2 «Private affair» (9 foto), capitolo 3 «Halloween Shinigami» (9 foto).
+ * Il capitolo 4 era vuoto: le 10 foto sono scelte da Claude tra le 109 della cartella «San Martino» (verificato dal libro
+ * «Ambizione e serenità» di Nicolò Andreula nelle foto); da confermare con il cliente.
+ * Le persone sono riconoscibili: il consenso non è verificato.
  */
 window.HOS_GALLERY = {
-  sets: {
-    halloween: "Halloween 2026",
-    affair: "Private Affair",
-    incontri: "Incontri",
-  },
-  photos: [
-    { id: "at-1", set: "halloween", w: 760, h: 1140 },
-    { id: "at-3", set: "incontri", w: 760, h: 950 },
-    { id: "pa-00497", set: "affair", w: 760, h: 507 },
-    { id: "hw-08455", set: "halloween", w: 760, h: 1140 },
-    { id: "pa-00506", set: "affair", w: 760, h: 1140 },
-    { id: "hw-08459", set: "halloween", w: 760, h: 1140 },
-    { id: "at-4", set: "incontri", w: 760, h: 950 },
-    { id: "hw-08463", set: "halloween", w: 760, h: 1140 },
-    { id: "pa-00514", set: "affair", w: 760, h: 1140 },
-    { id: "at-2", set: "halloween", w: 760, h: 1140 },
-    { id: "pa-00527", set: "affair", w: 760, h: 507 },
-    { id: "hw-08498", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08509", set: "halloween", w: 760, h: 1140 },
-    { id: "pa-00612", set: "affair", w: 760, h: 1140 },
-    { id: "hw-08541", set: "halloween", w: 760, h: 1140 },
-    { id: "pa-00665", set: "affair", w: 760, h: 1140 },
-    { id: "hw-08546", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08559", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08561", set: "halloween", w: 760, h: 1140 },
-    { id: "pa-00750", set: "affair", w: 760, h: 507 },
-    { id: "hw-08589", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08614", set: "halloween", w: 760, h: 1140 },
-    { id: "pa-00762", set: "affair", w: 760, h: 1140 },
-    { id: "hw-08625", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08660", set: "halloween", w: 760, h: 1140 },
-    { id: "pa-00795", set: "affair", w: 760, h: 1140 },
-    { id: "hw-08698", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08699", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08706", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08712", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08748", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08768", set: "halloween", w: 760, h: 1140 },
-    { id: "hw-08792", set: "halloween", w: 760, h: 1140 },
+  chapters: [
+    {
+      id: "c1", n: 1,
+      title: "Terrace above the Adriatic",
+      meta: "Polignano a Mare · Settembre 2026",
+      cover: "c1-1", coverPos: "50% 40%",
+      photos: [
+        { id: "c1-1", w: 1200, h: 674 }, { id: "c1-2", w: 1200, h: 674 }, { id: "c1-3", w: 1200, h: 674 }, { id: "c1-4", w: 1200, h: 1556 },
+      ],
+    },
+    {
+      id: "c2", n: 2,
+      title: "Private affair",
+      meta: "",
+      cover: "c2-1", coverPos: "50% 55%",
+      photos: [
+        { id: "c2-1", w: 1200, h: 800 }, { id: "c2-2", w: 1200, h: 1642 }, { id: "c2-3", w: 1200, h: 1800 }, { id: "c2-4", w: 1200, h: 1800 }, { id: "c2-5", w: 1200, h: 1800 },
+        { id: "c2-6", w: 1200, h: 1800 }, { id: "c2-7", w: 1200, h: 1800 }, { id: "c2-8", w: 1200, h: 1800 }, { id: "c2-9", w: 1200, h: 1800 }, { id: "c2-10", w: 1200, h: 1800 },
+      ],
+    },
+    {
+      id: "c3", n: 3,
+      title: "Shinigami — Halloween party by House of Saratoga",
+      meta: "Halloween 2026",
+      cover: "c3-1", coverPos: "50% 42%",
+      photos: [
+        { id: "c3-1", w: 1200, h: 1800 }, { id: "c3-2", w: 1200, h: 1800 }, { id: "c3-3", w: 1200, h: 1800 }, { id: "c3-4", w: 1200, h: 1800 }, { id: "c3-5", w: 1200, h: 1800 },
+        { id: "c3-6", w: 1200, h: 1800 }, { id: "c3-7", w: 1200, h: 1800 }, { id: "c3-8", w: 1200, h: 1800 }, { id: "c3-9", w: 1200, h: 1800 },
+      ],
+    },
+    {
+      id: "c4", n: 4,
+      title: "Autumn gathering w/ Nicolò Andreula",
+      meta: "",
+      cover: "c4-8", coverPos: "50% 30%",
+      photos: [
+        { id: "c4-1", w: 1200, h: 1800 }, { id: "c4-2", w: 1200, h: 1800 }, { id: "c4-3", w: 1200, h: 1800 }, { id: "c4-4", w: 1200, h: 1800 }, { id: "c4-5", w: 1200, h: 1800 },
+        { id: "c4-6", w: 1200, h: 1800 }, { id: "c4-7", w: 1200, h: 1800 }, { id: "c4-8", w: 1200, h: 1800 }, { id: "c4-9", w: 1200, h: 1800 }, { id: "c4-10", w: 1200, h: 1800 },
+      ],
+    },
   ],
 };
