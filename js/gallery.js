@@ -1,7 +1,7 @@
 /*
  * House of Saratoga — capitoli della sezione «Dagli eventi».
- * Un banner per ogni evento già fatto, con le sue foto. Le immagini stanno in assets/gallery/grid (anteprime) e
- * assets/gallery/full (ingrandimento e banner). Per aggiungere una foto: copia i due file con lo stesso nome e
+ * Un banner per ogni evento già fatto; cliccando si aprono le sue foto in ingrandimento. Le immagini stanno in
+ * assets/gallery/full (ingrandimento e copertina del banner). Per aggiungere una foto: copia il file con lo stesso nome e
  * aggiungi una riga in `photos`; per un nuovo capitolo: aggiungi un oggetto a `chapters`.
  *
  *  title   titolo del capitolo (come scritto dal cliente)

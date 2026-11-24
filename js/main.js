@@ -61,7 +61,7 @@
     });
   })();
 
-  /* ---------- Dagli eventi: un banner per ogni capitolo, striscia di foto, ingrandimento ---------- */
+  /* ---------- Dagli eventi: un banner per ogni capitolo; le foto si aprono al clic, in ingrandimento ---------- */
   (function () {
     var data = window.HOS_GALLERY;
     var root = $("#chapters");
@@ -70,57 +70,27 @@
     var lb = $("#lightbox"), lbImg = $("#lb-img"), lbCap = $("#lb-cap");
     var cur = { c: 0, i: 0 };
 
-    function url(kind, id) { return "assets/gallery/" + kind + "/" + id + ".jpg"; }
-    var ARROW_L = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>';
-    var ARROW_R = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>';
+    function url(id) { return "assets/gallery/full/" + id + ".jpg"; }
 
     root.innerHTML = CH.map(function (c, ci) {
       var n = c.photos.length;
-      var tiles = c.photos.map(function (p, i) {
-        return '<button type="button" class="gal__item" data-c="' + ci + '" data-i="' + i + '" aria-label="Ingrandisci foto ' + (i + 1) + " di " + n + " · " + esc(c.title) + '">' +
-          '<img src="' + url("grid", p.id) + '" width="' + p.w + '" height="' + p.h + '" alt="" loading="lazy" decoding="async"></button>';
-      }).join("");
       return '<article class="chapter reveal" id="chapter-' + c.n + '" aria-labelledby="chapter-' + c.n + '-t">' +
         '<div class="chapter__banner">' +
-          '<img class="chapter__cover" data-pos="' + esc(c.coverPos || "50% 50%") + '" src="' + url("full", c.cover) + '" alt="" loading="lazy" decoding="async">' +
+          '<img class="chapter__cover" data-pos="' + esc(c.coverPos || "50% 50%") + '" src="' + url(c.cover) + '" alt="" loading="lazy" decoding="async">' +
           '<div class="chapter__txt">' +
             '<p class="chapter__k" lang="en">Chapter ' + c.n + "</p>" +
             '<h3 class="chapter__t" id="chapter-' + c.n + '-t" lang="en">' + esc(c.title) + "</h3>" +
             '<p class="chapter__meta">' + (c.meta ? esc(c.meta) + " · " : "") + n + " foto</p>" +
           "</div>" +
-          '<button type="button" class="chapter__open" data-c="' + ci + '" data-i="0" aria-label="Guarda le foto: Chapter ' + c.n + ", " + esc(c.title) + '"><span>Guarda le foto</span> <span aria-hidden="true">→</span></button>' +
+          '<button type="button" class="chapter__open" data-c="' + ci + '" aria-label="Guarda le ' + n + " foto: Chapter " + c.n + ", " + esc(c.title) + '"><span>Guarda le foto</span> <span aria-hidden="true">→</span></button>' +
         "</div>" +
-        '<div class="chapter__bar"><span class="chapter__count">Tutte le foto del capitolo</span>' +
-          '<div class="gal-nav"><button class="gal-nav__btn" type="button" data-step="-1" aria-label="Foto precedenti">' + ARROW_L + '</button>' +
-          '<button class="gal-nav__btn" type="button" data-step="1" aria-label="Foto successive">' + ARROW_R + "</button></div></div>" +
-        '<div class="gal" tabindex="0" role="region" aria-label="Foto del capitolo ' + c.n + ": " + esc(c.title) + '. Scorri di lato">' + tiles + "</div>" +
       "</article>";
     }).join("");
     $$(".chapter__cover", root).forEach(function (img) { img.style.objectPosition = img.getAttribute("data-pos"); });
 
-    /* Frecce di ogni striscia */
-    function updateNav(strip) {
-      var art = strip.closest(".chapter"), max = strip.scrollWidth - strip.clientWidth;
-      var prev = $('[data-step="-1"]', art), next = $('[data-step="1"]', art);
-      prev.disabled = strip.scrollLeft <= 4;
-      next.disabled = max <= 4 || strip.scrollLeft >= max - 4;
-    }
-    $$(".gal", root).forEach(function (strip) {
-      strip.addEventListener("scroll", function () { requestAnimationFrame(function () { updateNav(strip); }); }, { passive: true });
-      updateNav(strip);
-    });
-    window.addEventListener("resize", function () { $$(".gal", root).forEach(updateNav); });
-
     root.addEventListener("click", function (e) {
-      var s = e.target.closest("[data-step]");
-      if (s) {
-        var strip = $(".gal", s.closest(".chapter")), it = $(".gal__item", strip);
-        var d = it ? it.getBoundingClientRect().width + 10 : 260;
-        strip.scrollBy({ left: +s.getAttribute("data-step") * d * 2, behavior: reduceMotion ? "auto" : "smooth" });
-        return;
-      }
       var b = e.target.closest("[data-c]");
-      if (b) openAt(+b.getAttribute("data-c"), +b.getAttribute("data-i"));
+      if (b) openAt(+b.getAttribute("data-c"), 0);
     });
 
     /* Ingrandimento: si sfoglia dentro il capitolo */
@@ -131,10 +101,10 @@
       var p = list[i];
       lbImg.classList.add("is-loading");
       lbImg.onload = function () { lbImg.classList.remove("is-loading"); };
-      lbImg.src = url("full", p.id);
+      lbImg.src = url(p.id);
       lbImg.alt = ch.title + " — foto " + (i + 1) + " di " + n;
       lbCap.innerHTML = '<b lang="en">Chapter ' + ch.n + "</b>" + (i + 1) + " / " + n;
-      [1, -1].forEach(function (d) { new Image().src = url("full", list[(i + d + n) % n].id); });
+      [1, -1].forEach(function (d) { new Image().src = url(list[(i + d + n) % n].id); });
     }
     function openAt(c, i) {
       show(c, i);
