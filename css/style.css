@@ -469,8 +469,8 @@ body.menu-open .site-header { background: var(--forest-deep); backdrop-filter: n
 /* ---------- CTA finale ---------- */
 .section--cta { text-align: center; }
 .cta { display: grid; justify-items: center; gap: var(--sp-3); }
-.cta__mark { width: 40px; color: var(--forest); opacity: .9; }
-.cta .display { color: var(--forest); }
+.cta__mark { width: 40px; color: var(--sage); opacity: .9; }
+.cta .display { color: inherit; }
 .cta .lede { margin-inline: auto; }
 .cta__note { font-family: var(--sans); font-size: .7rem; letter-spacing: .14em; opacity: .85; }
 
