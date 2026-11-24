@@ -80,7 +80,7 @@
           '<div class="chapter__txt">' +
             '<p class="chapter__k" lang="en">Chapter ' + c.n + "</p>" +
             '<h3 class="chapter__t" id="chapter-' + c.n + '-t" lang="en">' + esc(c.title) + "</h3>" +
-            '<p class="chapter__meta">' + (c.meta ? esc(c.meta) + " · " : "") + n + " foto</p>" +
+            (c.meta ? '<p class="chapter__meta">' + esc(c.meta) + "</p>" : "") +
           "</div>" +
           '<button type="button" class="chapter__open" data-c="' + ci + '" aria-label="Guarda le ' + n + " foto: Chapter " + c.n + ", " + esc(c.title) + '"><span>Guarda le foto</span> <span aria-hidden="true">→</span></button>' +
         "</div>" +
